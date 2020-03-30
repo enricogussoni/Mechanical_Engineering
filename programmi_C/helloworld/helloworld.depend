@@ -1,0 +1,9 @@
+# depslib dependency file v1.0
+1384202802 source:e:\enricogussoni\polimi\info b\programmicb\helloworld\1.c
+	<stdio.h>
+	<string.h>
+
+1384202778 source:e:\enricogussoni\polimi\info b\programmicb\stringalfa\stringalfa2.c
+	<stdio.h>
+	<string.h>
+

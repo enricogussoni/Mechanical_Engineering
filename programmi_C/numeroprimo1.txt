@@ -1,0 +1,23 @@
+#include <stdio.h>
+
+int main ()
+{
+
+int n;
+int x;
+
+do
+{
+printf("S'inserisca un numero intero positivo:\n");
+scanf("%d";&n);
+}while(n<=0);
+
+do
+{
+ x++=x
+ printf("Per x=%d si ha ")
+}while((n%(n-x)!=0)
+       
+       
+return 0;
+}

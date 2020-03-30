@@ -1,0 +1,45 @@
+#include <stdio.h>
+
+int main ()
+{
+	                         /*Programma per trovare l'mcm tra 2 numeri*/
+int x,y;
+int mcm=0;
+int max;
+
+                                            /*Richiesta dei due numeri*/
+do
+{
+    printf("Inserisci un numero positvo x:\n");
+    scanf("%d",&x);
+}while(x<0);
+
+do{
+    printf("Inserisci un numero positvo y:\n");
+    scanf("%d",&y);
+}while(y<0);
+
+                                         /*Individuazione del maggiore*/
+
+if(x==y)
+printf("Il mcm è %d\n",x);
+   else
+   {
+    if(x>y)
+          max=x;
+       else
+          max=y;
+   }
+                                                            /*Calcolo per iterazione*/
+
+mcm=max;
+while(!(mcm%x==0)&&(mcm%y==0))
+{
+ mcm+=max;
+}
+
+printf("Il mcm tra %d e %d è %d\n",x,y,mcm);
+
+return 0;
+
+}

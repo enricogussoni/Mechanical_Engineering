@@ -1,0 +1,29 @@
+#include <stdio.h>
+
+int main()
+{
+float x;
+int scelta;
+
+                                                  /*Inserimento misura*/
+ printf("Inserire la misura da convertire:\n");
+ scanf("%f",&x);   
+                                     
+ do{                                     /*Richiesta tipo di conversione*/
+ printf("Si desidera convertirla in ft (1), lb (2) o yd (3)?\n");
+ scanf("%d",&scelta);} while ((scelta !=1)||(scelta !=2)||(scelta !=3));
+ 
+                                                         /*Conversione*/
+ if(scelta==1)
+    printf("%f ft\n", x/0.3048);
+ 
+ if(scelta==2)
+    printf("%f lb\n", x/0.45359237);
+    
+ if(scelta==3)
+    printf("%f yd\n", x/0.9144);
+    
+ printf("FINE PROGRAMMA");
+ 
+return 0;
+}

@@ -1,0 +1,83 @@
+#include <stdio.h>
+
+#define dim 10     /*Massimo numero di caratteri che descrive il ruolo*/
+#define dimnome 15       /*Nome e cognome possono avere dimmax diverse*/
+#define dimcognome 15
+#define numg 22                          /*11 giocatori + una panchina*/
+int main()
+{                                        /*Programma squadra di calcio*/
+ typedef struct  
+        { 
+		  int goal;
+		  char ruolo[dim];
+		  int maglia;
+		  char nome[dimnome];
+		  char cognome [dimcognome];
+		}giocatore;
+		
+ giocatore squadra[numg];
+ int c,opzione;
+ int goaltot=0,goalatt=0,goalcen=0,goaldif=0,goalsub=0;
+                                                         /*Inserimento*/
+ for(c=0;c<numg;c++)
+    {
+	 printf("Inserire il nome del giocatore %d\n",c+1);
+	 scanf("%s",&squadra[c].nome);
+	 printf("Inserire il cognome del giocatore %d\n",c+1);
+	 scanf("%s",&squadra[c].cognome);
+	 printf("Inserire il ruolo del giocatore %d\n",c+1);
+	 scanf("%s",&squadra[c].ruolo);
+	 printf("Inserire il numero di maglia del giocatore %d\n",c+1);
+	 scanf("%d",&squadra[c].maglia);
+	 printf("Inserire il nonumero di goal del giocatore %d\n",c+1);
+	 scanf("%s",&squadra[c].goal);
+	 }
+                                                             /*Calcolo*/
+ for(c=0;c<numg;c++)
+     goaltot=goaltot+squadra[c].goal;
+ 
+ for(c=0;c<numg;c++)
+	 if(squadra[c].ruolo[0]=='a')                  /*'a' di attaccante*/
+	 goalatt=goalatt+squadra[c].goal;
+
+ for(c=0;c<numg;c++)
+     if(squadra[c].ruolo[0]=='c')                 /*'c' di centrocampo*/
+     goalcen=goalcen+squadra[c].goal;      
+     
+ for(c=0;c<numg;c++)
+	  if(squadra[c].ruolo[0]=='d')                  /*'d' di difensore*/
+	  goaldif=goaldif+squadra[c].goal;  
+	  
+ for(c=0;c<numg;c++)
+     if(squadra[c].ruolo[0]=='p')                    /*'p' di portiere*/
+     goalsub=goalsub-squadra[c].goal;                                                    
+                                                   /*Richiesta opzione*/
+ do{
+	 printf("Scegliere tra le seguenti opzioni:\n"
+         "1-Totale goal fatti dalla squadra\n"
+         "2-Totale goal fatti dagli attaccanti\n"
+         "3-Totale goal fatti dai centrocampisti\n"
+         "4-Totale goal fatti dai difensori\n"
+         "5-Totale goal subiti dalla squadra\n");
+ scanf("%d",&opzione);}while((opzione<1)||(opzione>5));
+ 
+ switch(opzione)
+       {
+		case 1:printf("Goal fatti dalla squadra=%d\n",goaltot);
+		        break;
+		        
+		case 2:printf("Goal fatti dagli attaccanti=%d\n",goalatt);
+		        break;
+		        
+		case 3:printf("Goal fatti dai centrocampisti=%d\n",goalcen);
+		       break;
+		       
+		case 4:printf("Goal fatti dai difensori=%d\n",goaldif);
+		       break;
+		       
+		case 5:printf("Goal subiti dalla squadra=%d\n",goalsub);
+               break;
+	}
+        
+return 0;
+}                                                 

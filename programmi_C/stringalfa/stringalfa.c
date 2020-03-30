@@ -1,0 +1,32 @@
+#include <stdio.h>
+#include <string.h>
+
+int main()
+{
+ int c,lungmax,flag=0;
+ char stringa1,stringa2;
+
+ printf("Inserire stringa1:\n")
+ scanf("%s",stringa1);
+ printf("Inserire stringa2:\n")
+ scanf("%s",stringa2);
+
+ if(strlen(stringa1)>strleng(stringa2))
+    lungmax=sterlen(stringa1);
+ else
+    lungmax=sterlen(stringa2);
+
+ for(c=0;(c<lungmax)||(flag=1);c++)
+    {
+	 if stringa1[c]!=stringa2[c]
+	    flag=1;
+	}
+ printf("CONTROLLO: c=%d\n",c);
+
+ if(stringa1[c]>stringa2[c])
+    printf("2 precede 1\n");
+ else
+    printf("1 precede 2\n");
+
+return 0;
+}
