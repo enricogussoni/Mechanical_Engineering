@@ -1,0 +1,13 @@
+clear
+%Tavola pitagorica nxm
+
+n=5 
+m=10
+
+tp=zeros(n,m);
+for x=1:n
+	for y=1:m
+		tp(x,y)=x*y;
+		end
+	end
+tp

@@ -1,0 +1,11 @@
+d=[ 2 3 1 5 1 4 2 6]
+o=d.*0
+l=length(d)
+for      x=1:length(d)
+                           min(d)
+	o(x)=min(d)
+	p=find(d==min(d))
+	d(p(1))=[]
+	end
+d
+o
