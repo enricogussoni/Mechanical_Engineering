@@ -1,0 +1,369 @@
+# LABORATORIO 2 
+
+francescopaolo.manicone@unimi.it
+
+
+
+
+# Argomenti trattati in questo secondo laboratorio:
+# Import/Export dataframe
+# Esempi di analisi statistica univariata con grafici
+# Esempi di analisi univariata con tabelle di frequenza per variabili categoriche e numeriche
+# Esempi di analisi statistica bivariata e multivariata con grafici
+# Estrazione di sottoinsiemi di dati
+# Test, cicli 
+
+
+# ANALISI DATI UNIVARIATI
+
+# Selezionare la directory di lavoro ovvero la cartella dove di default verranno cercati o salvati i file utilizzati da R
+
+# importazione dataset
+record <- read.table('runningrecords100.txt', header=T)
+
+is.data.frame(record)
+head(record) #mostra le prime righe del data.frame 
+dim(record) #dimensioni del data.frame
+
+
+#Definizioni.
+
+- Una DISTRIBUZIONE DI FREQUENZA  una tabella che suddivide un insieme di dati in un numero conveniente di classi (categorie),
+mostrando anche il numero di elementi che appartengono a ogni classe.
+
+- Frequenza assoluta:  il numero di volte che un evento si verifica indipendentemente dal numero delle prove.
+- Frequenza relativa:  il rapporto tra la frequenza assoluta e il numero totale delle prove.
+
+hist(record$m100,prob=TRUE)	#parametro prob: grafico frequenze o densità (conteggio o area)
+
+hist(record$m100,prob=TRUE,main="Records 100m",xlab="sec",col="azure")
+
+hist(record$m100,breaks=10,prob=TRUE,main="Records 100m",xlab="sec",col="azure")
+
+hist(record$m100,breaks=10,prob=TRUE,main="Records 100m",xlab="sec",xlim=c(10.5,13),col="azure")
+
+hist(record$m100,breaks=c(min(record$m100),11.15,11.50,11.85,12.20,12.55,max(record$m100)),prob=TRUE,main="Records 100m",xlab="sec",xlim=c(10.5,13),col="azure")
+
+# tabella frequenze
+
+hist(record$m100,plot=FALSE) # per avere tabella frequenze e densità
+
+istogramma=hist(record$m100,plot=FALSE) 
+
+summary(istogramma)
+
+#            Length Class  Mode     
+# breaks      7      -none- numeric     # I limiti delle classi  
+# counts      6      -none- numeric     # Le frequenze assolute
+# intensities 6      -none- numeric     # same as density. Deprecated, but retained for compatibility
+# density     6      -none- numeric     # le densita' 
+# mids        6      -none- numeric     # punti medi delle classi
+# xname       1      -none- character   # il nome della variabile in esame
+# equidist    1      -none- logical     # un valore logico che indica se le classi sono equispaziate
+
+istogramma$breaks
+
+
+
+
+
+# indici sintetici di posizione:
+
+mean(record)
+min(record$m100)
+max(record$m100)
+
+
+#..e supponendo che i valori siano ordinati:
+
+quantile(record$m100,0.25)
+quantile(record$m100,0.50)  #restituisce la mediana (l'elemento in posizione centrale in un insieme di numeri)
+median(record$m100)
+quantile(record$m100,0.75)
+quantile(record$m100) #restituisce il min, i tre quartili e il max
+quantile(record$m100, c(1:10)/20) #restituisce i quantili dell'ordine specificato in  c(1:10)/20
+
+# indice di variabilità:
+
+var(record)		#varianza
+sd(record)
+
+			#deviazione standard
+		
+
+# riepilogo:
+
+summary(record$m100) o 
+summary(record)
+
+
+# se ho dei NA (Not Available), attenzione a media e mediana: 
+mean(record$m100, na.rm = T) 
+median(record$m100, na.rm = T)
+
+
+
+# boxplot
+
+boxplot(record$m100)
+
+boxplot(record$m100,horizontal=TRUE)
+
+boxplot(record$m100,horizontal=TRUE, main="boxplot records 100m",xlab="sec")
+
+
+# GRAFICI in 2 dimensioni
+
+rm(list=ls())
+# Funzione plot con argomenti
+# le ascisse e le ordinate dei punti da plottare:
+
+x <- 1:100
+y <- x^2
+plot(x,y)
+
+
+# Grafico della densità di una variabile Exp(1)
+x=seq(0,10,by=0.01)
+y=exp(-x)
+
+plot(x,y)
+
+# anziché punti, tracciare una linea che passa per i vari punti
+plot(x,y,type="l")
+
+# aggiungere in rosso la densità di una variabile Exp(1/2)
+
+w=exp(-x/2)/2
+points(x,w,type="l", col=2)	#non crea un nuovo grafico, ma lo sovrappone al precedente
+
+
+# provate il comando
+demo(graphics) 
+# vi fa una rassegna di possibili grafici
+# cliccate sul grafico per passare al successivo
+
+
+
+#######################################
+# ESERCIZIO 1 - Variabili categoriche #
+#######################################
+
+# Creo un vettore di realizzazioni di una variabile categorica
+
+province <- c("MI","MI","VA","BG","LO","LO","CR","Alt","CR","MI","Alt","CR","LO","VA","MI","Alt","LO","MI")
+province
+
+# Di che tipo è il vettore province?
+
+is(province)
+
+# Vediamo che R legge il vettore province come un vettore di caratteri.
+# Siccome noi lo vogliamo considerare come realizzazioni di una variabile
+# categorica, dobbiamo convertirlo in un vettore di fattori.
+# Per convertire il vettore province in tipo factor posso indifferentemente
+# utilizzare i comandi "factor" o "as.factor".
+
+prov <- factor(province,levels=c('MI','LO','BG','CR','VA','Alt'))
+prov
+
+provi <- as.factor(province)
+provi
+
+is(prov)
+is(provi)
+
+plot(prov) # giocare un po' con le opzioni grafiche!
+plot(prov,col='red')
+
+# Il comando plot, se applicato ad una variabile creata con 'factor'
+# o 'as.factor' capisce da solo che deve fare un grafico di una variabile 
+# aleatoria categorica, ovvero un grafico a barre.  
+# L'altezza di ogni rettangolo corrisponde alla frequenza assoluta 
+# di ogni livello.
+
+# Il comando "table" conta il numero di elementi per ogni categoria,
+# ovvero crea una tabella delle frequenze assolute
+
+provASSOLUTE <- table(prov)
+provASSOLUTE
+
+# Per ottenenere le frequenze relative di ogni categoria, si può 
+# dividere per il totale, oppure utilizzare il comando "prop.table"
+
+provRELATIVE <- table(prov)/length(prov) 
+provRELATIVE
+
+provRELATIVE <- prop.table(provASSOLUTE)
+provRELATIVE
+
+barplot(provRELATIVE,xlab="province",ylab="proporzioni",main="Bar plot delle province")
+
+# L'altezza di ogni rettangolo corrisponde alla 
+# frequenza relativa di ogni livello.
+
+# Per creare un nuovo device grafico, e tenere aperti più grafici 
+# contemporaneamente
+
+windows()  
+
+#Per aprire una nuova finestra grafica:
+# x11() #Linux
+# windows() #Solo per Windows
+# quartz() #Solo per Mac
+
+pie(provRELATIVE)  # grafico a torta
+help(pie)
+pie(provRELATIVE,labels=c('MI','LO','BG','CR','VA','Alt'),radius=1,
+  col=c('red','orange','yellow','green','lightblue','violet'),main='Grafico a torta Province')
+
+# anche qui si può giocare un po' con le opzioni grafiche 
+# per abbellire il grafico
+
+# l'area di ogni fetta è proporzionale alla frequenza di ogni livello.
+
+# per estrarre la frequenza assoluta/relativa di una specifica categoria:
+
+provASSOLUTE[2]
+provASSOLUTE["LO"]
+provRELATIVE[2]
+provRELATIVE["LO"]
+
+# L'unico indice di posizione per le variabili categoriche è la moda,
+# ossia la categoria con la frequenza assoluta/relativa maggiore.
+# per estrarre la moda
+
+provASSOLUTE[which(provASSOLUTE==max(provASSOLUTE))]
+
+# oppure in maniera più concisa
+
+provASSOLUTE[which.max(provASSOLUTE)]
+
+########################################
+# ESERCIZIO 2 - Variabili quantitative #
+########################################
+
+## analisi dei dati quantitativi contenuti 
+## nel file "studenti.txt"
+
+# Importazione di dataset
+
+studenti=read.table("studenti.txt",header=TRUE)
+
+attach(studenti)
+
+head(studenti)
+dim(studenti)
+names(studenti)
+str(studenti)
+
+# Quantità di interesse di una variabile quantitativa.
+# Consideriamo la variabile "Altezza".
+
+mean(Altezza)   # Media 
+
+var(Altezza)    # Varianza
+
+sd(Altezza)     # Deviazione standard
+
+NB: R calcola la varianza come la somma degli scarti quadratici
+dalla media diviso per (n-1). Per calcolare la variabilità del campione,
+ovvero la somma degli scarti quadratici dalla media diviso per n,
+non esiste una funzioni in R, bisogna farlo a mano.
+
+n = length(Altezza)
+(n-1)/n*var(Altezza)
+sqrt((n-1)/n)*sd(Altezza)
+
+min(Altezza)    # Minimo 
+
+max(Altezza)    # Massimo
+
+median(Altezza) # Mediana
+
+quantile(Altezza,probs=0.25) # Quartili
+
+quantile(Altezza,probs=0.5)
+
+quantile(Altezza,probs=0.75)
+
+quantile(Altezza) # visualizza minimo, massimo e i 3 quartili
+
+# In un singolo comando
+
+summary(Altezza) 
+summary(studenti)
+
+# Istogrammi
+
+hist(Altezza)
+
+hist(Altezza, prob=TRUE, main="Istogramma delle altezze", xlab="pollici", col="red")
+
+# Si può anche scegliere il numero di colonne dell'istogramma
+# attraverso il comando breaks (num_colonne=breaks - 1). In questo
+# modo, però, R non sempre segue la nostra scelta esattamente
+
+hist(Altezza, breaks=6, prob=TRUE, main="Istogramma delle altezze", xlab="pollici", col="red")
+
+# In questo modo invece funzione sempre:
+
+hist(Altezza,breaks=c(54,60,66,72,78,84),prob=TRUE,main="Istogramma delle altezze",xlab="pollici",col="red")
+
+# Quando le classi dell'istogramma hanno basi di lunghezza diversa
+# è importantissimo (!!!) che in ascissa ci sia la densità, altrimenti
+# l'istogramma non ha senso
+
+windows()
+hist(Altezza,breaks=c(54,60,66,84),prob=FALSE,main="Istogramma delle altezze - SBAGLIATO",xlab="pollici",col="red")
+windows()
+hist(Altezza,breaks=c(54,60,66,84),prob=TRUE,main="Istogramma delle altezze - GIUSTO",xlab="pollici",col="red")
+
+# Boxplot
+
+boxplot(Altezza, main="Boxplot delle altezze", xlab="pollici",col="forestgreen")
+
+# Confronto con i dati
+
+par(mfrow=cbind(1,2))
+boxplot(Altezza, main="Boxplot delle altezze", ylab="pollici",ylim=range(Altezza),col="forestgreen")
+plot(rep(0,length(Altezza)),Altezza,ylim=range(Altezza),main="Dati altezze",xlab="",ylab="pollici")
+
+# Relazioni tra variabili
+
+# Le ore di sonno di uno studente sono legate 
+# all'orario a cui va a dormire?
+
+Ore_Sonno = Ora_Sveglia - Ora_Letto
+
+# Analizziamo quindi la relazione tra le variabili 
+# Ora_Letto e Ore_Sonno
+
+windows()
+plot(Ora_Letto,Ore_Sonno,main="Scatterplot di Ora_Letto vs. Ore_sonno")
+
+cov(Ora_Letto,Ore_Sonno)
+cor(Ora_Letto,Ore_Sonno)
+
+# IMPORTANTE: ricordarsi di effetturare il detach 
+# quando si finisce di lavorare su un dataset.
+
+detach(studenti)
+
+
+#TABELLE DI FREQUENZA
+
+
+# Calcolo delle occorrenze e tabella di contingenza dei conteggi (frequenze assolute) con table() 
+
+A<-c(0,0,0,1,3,2,1,0,0,3,2,1,3)
+table(A)       #frequenze assolute
+prop.table(table(A))		#frequenze relative
+prop.table(table(A))*100     # frequenze percentuali
+sum(prop.table(table(A))*100 )  # per verifica
+
+B<-c(0,0,1,1,3,2,0,0,1,3,2,1,2)
+table(B,A)
+
+
+

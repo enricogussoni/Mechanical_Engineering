@@ -1,0 +1,449 @@
+# LABORATORIO 1 
+
+francescopaolo.manicone@unimi.it
+
+
+
+
+# Per scaricare R:   http://www.r-project.org/
+
+# Per maggiori info su R:
+# - materiale informativo sul sito
+# - bottone "help" in interfaccia R
+
+#Nella pagina del corso 
+# troverete tutti i materiali e i file dati che utilizzeremo nei laboratori.
+
+# Argomenti trattati in questo primo laboratorio:
+# Comandi base di R (scalari, vettori, matrici e relative operazioni)
+# Import/Export dataframe
+# Esempi di analisi statistica univariata con grafici
+
+# Commento: tutto quanto preceduto da "#" non viene letto dalla Console di R
+# potete dunque copiare quanto scritto sotto direttamente nella Console senza 
+# dover togliere i commenti.
+
+# Poiché R è un linguaggio "interpretato", ogni vostro comando verrà subito eseguito singolarmente.
+# Il linguaggio è sensibile all'uso dei caratteri minuscoli e maiuscoli. 
+# L'utilizzo di "script" consente l'esecuzione consecutiva di una sequenza di comandi testuali.
+
+# Il linguaggio R è anche "Object Oriented": quindi la programmazione si basa sulla costruzione degli oggetti 
+# che serviranno alla risoluzione del problema e delle funzioni che possono operare su di essi. 
+
+# Caratteri speciali: ~ (tilde) tenere schiacciato il tasto ALT e comporre 126 sul tastierino numerico
+#                     { (graffa aperta) tenere schiacciato il tasto ALT e comporre 123 sul tastierino numerico
+#                     } (graffa chiusa) tenere schiacciato il tasto ALT e comporre 125 sul tastierino numerico
+
+# OGGETTI ELEMENTARI:
+
+# scalari
+
+a <- 10
+a
+
+# operatori aritmetici: +, -, *, /, %/%, %%
+
+q <- a%/%3
+r <- a%%3
+
+# funzioni matematiche elementari: sqrt(), abs(), exp(), log(), log10()
+
+t <- sqrt(a*12 - 5)
+
+# operatori relazionali: 
+#	==	uguaglianza
+#	!=	diversità
+#	<, <=	minore, minore o uguale (idem per il maggiore)
+#	&	AND
+#	|	OR
+#	!	NOT
+
+a < 0 	# a è negativo?
+
+# conversione verso un tipo specificato: "as." (character, integer, numeric, logical)
+
+as.numeric("10")
+
+#esempio:
+num <- as.numeric("003")
+
+as.numeric("3X")
+
+as.integer(12.5)
+
+# tipologie di dati:
+- character
+- numeric
+- integer
+- logical
+- complex
+
+il comando str restituisce informazioni sulla natura (struttura) di un oggetto: 
+
+str(num)
+
+
+# vettori
+
+v <- c(2,3,4,5)
+v
+
+v1<-c(a,v)
+v1
+
+u<-1:5
+u
+
+u<-seq(1,5,len=10)
+u
+
+u<-seq(1,5,by=10)
+u
+
+z<-rep(v,2)
+z
+
+x<-rep(seq(10,8,by=-0.5),3)
+x
+
+#la funzione match  individua uno o più elementi all'interno di un vettore di componenti; 
+# il risultato è un vettore che indica la posizione che occupa la prima occorrenza dell'elemento:
+
+trova<-match(2,c(4,5,2,3,22,5))
+trova
+
+trova<-match(c(24),c(4,5,2,3,22,5))
+trova
+
+trova<-match("a",c("v","c","a","a","x"))
+trova
+
+#per determinare  tutte le posizioni di un elemento ripetuto:
+
+which(c("v","c","a","a","x")=="a") 
+
+v<-c(3, 4, 5, 3, 4, 7, 6, 5, 8, 9, 3, 5, 1, 2)
+
+unique(v)
+
+duplicated(v)
+
+unique(v[duplicated(v)])
+
+which(c("v","c","a","a","x")=="a") 
+
+summary(v)
+
+
+# Esempio di "which":
+
+x <- -3:8
+x
+
+which(x<2)
+
+which( (x >= -1) & (x < 5) ) 
+
+which( (x < -2) | (x > 1) ) 
+
+# NB: la Which restituisce degli indici. Se vogliamo sapere i valori:
+
+z <- which( (x < -2) | (x > 1) ) 
+x[z]
+
+
+#GESTIONE DI UNA SESSIONE
+
+ls() #produce una lista degli oggetti "attivi"
+ls.str() #produce una lista degli oggetti attivi e altri dettagli sul tipo e il valore
+rm(v1) #cancella l'oggetto v1
+rm(list=ls()) #cancella l'intera area di lavoro
+
+
+# matrici
+
+W <- matrix(data = c(11,12,13,14,15,16), nrow = 2, ncol = 3, byrow = F)
+W
+
+v <-1:5
+v1<-6:10
+length(v) #lunghezza del vettore v
+length(v1)
+str(v1)
+
+
+W1<-cbind(v,v1) #Costruisce la matrice W1 le cui colonne sono i vettori v e v1
+
+W2<-rbind(v,v1) #Costruisce la matrice W1 le cui righe sono i vettori v e v1
+
+
+dim(W1)
+dim(t(W2))
+
+# W1 e t(W2) hanno le stesse dimensioni, possiamo quindi farne
+# il prodotto, perchè in R il prodotto tra matrici è un'operazione
+# fatta componente per componente!!
+
+W1*t(W2)
+
+# Se vogliamo fare il prodotto matriciale classico, invece,
+# si usa il comando %*% (stando attenti alle dimensioni delle matrici):
+
+dim(W1)
+dim(W2)
+
+W1%*%W2
+t(W1)%*%t(W2)
+t(W1)%*%W2
+
+# Se i vettori rappresentano relizzazioni di una variabile categorica,
+# è possibile convertire il vettore:
+
+factor(rep(c('A', 'B'),c(3,4)))
+
+s = c(rep('A',3),rep('T',3),rep('G',3),rep('C',3))
+fs = factor(s)
+
+sf = as.factor(s)
+sf
+
+# Estrazione di elementi da un vettore o da una matrice
+
+v
+v[2]
+v[c(2,3)]
+v[-2]
+v[-c(2,3)]
+
+W
+W[2,3]
+W[2,c(2,3)]
+W[2,]
+W[,c(2,3)]
+
+
+# OPERAZIONI ALGEBRICHE IN R
+# NB: R di default effettua le operazioni componente per componente
+
+rm(list=ls())
+
+a <- 1
+b <- 2
+c <- c(2,3,4)
+d <- c(10,10,10)
+ 
+a+b # scalare + scalare
+c+d # vettore + vettore
+a*b # scalare * scalare
+c*d # vettore * vettore (componente per componente)
+c+a # vettore + scalare
+sum(c) # somma componenti c
+prod(c) # prodotto componenti c
+c^2 # attenzione: operazioni sono sempre componente per componente in modo ordinato
+
+e = c(1,2)
+e
+d
+e+d
+
+# Attenzione però... non sempre R ti avvisa con un Warning,
+# se sommo due vettori con dimensioni una multipla dell'altra
+# R ricicla gli elementi del vettore più piccolo senza avvisare
+
+e2=c(2,3,4,5,6,7)
+e2
+d
+length(e2)
+length(d)
+d+e2
+
+
+
+#Data frame 
+
+
+#ESEMPIO 1: 
+
+stato<-c("Argentina","Canada","Italia","Spagna")
+
+is.numeric(stato)
+is.numeric(c)
+m100<-c(11.61,11,11.29,11.8)
+Tab<-cbind(stato,m100)
+Tab
+
+is.numeric(Tab[,2])
+
+Tab<-data.frame(stato,m100) #Crea un dataframe con la prima colonna stato e la seconda colonna record
+
+is.numeric(Tab[,2])
+
+Tab$stato
+Tab$m100
+
+#ESEMPIO 2:
+
+Var1 = c(45020,45679,46789,43126,42345,47568,45674)
+Var2 = c(30,19,29,NA,25,26,27)
+Var3 = c(3,3,1,NA,3,2,NA)
+Var4 = c(30,22,30,NA,28,28,27)
+esame=data.frame(matricola=as.character(Var1),voti_S =Var2,voti_O=Var3,voti_TOT=Var4)
+esame
+
+
+#Dati qualitativi
+
+# i dati sono di tipo qualitativo se assumono valori legati ad attributi (sesso = maschio / femmina; titolo di studi, fascia 
+	di reddito...). I comandi factor e ordered consentono di esplicitare i valori consentiti ed eventualmente stabilirne 
+	una relazione d'ordine.
+
+sesso <- c("m", "m", "f", "m", "f")
+sesso
+
+studio <- c("sup", "lau", "sup", "med", "lau")
+studio
+
+str(sesso)
+str(studio)
+
+sesso2 <-factor(sesso)
+studio2 <- factor(studio)
+
+studioORD <- factor(studio, levels=c("med", "sup", "lau"))
+
+oppure  
+
+ordered(studio2,levels=c("med", "sup", "lau"))
+
+
+# ANALISI DATI UNIVARIATI
+
+# Selezionare la directory di lavoro ovvero la cartella dove di default verranno cercati o salvati i file utilizzati da R
+
+# importazione dataset
+record <- read.table('runningrecords100.txt', header=T)
+
+is.data.frame(record)
+head(record) #mostra le prime righe del data.frame 
+dim(record) #dimensioni del data.frame
+
+
+#Definizioni.
+
+- Una DISTRIBUZIONE DI FREQUENZA  una tabella che suddivide un insieme di dati in un numero conveniente di classi (categorie),
+mostrando anche il numero di elementi che appartengono a ogni classe.
+
+- Frequenza assoluta:  il numero di volte che un evento si verifica indipendentemente dal numero delle prove.
+- Frequenza relativa:  il rapporto tra la frequenza assoluta e il numero totale delle prove.
+
+hist(record$m100,prob=TRUE)	#parametro prob: grafico frequenze o densità (conteggio o area)
+
+hist(record$m100,prob=TRUE,main="Records 100m",xlab="sec",col="azure")
+
+hist(record$m100,breaks=10,prob=TRUE,main="Records 100m",xlab="sec",col="azure")
+
+hist(record$m100,breaks=10,prob=TRUE,main="Records 100m",xlab="sec",xlim=c(10.5,13),col="azure")
+
+hist(record$m100,breaks=c(min(record$m100),11.15,11.50,11.85,12.20,12.55,max(record$m100)),prob=TRUE,main="Records 100m",xlab="sec",xlim=c(10.5,13),col="azure")
+
+# tabella frequenze
+
+hist(record$m100,plot=FALSE) # per avere tabella frequenze e densità
+
+istogramma=hist(record$m100,plot=FALSE) 
+
+summary(istogramma)
+
+#            Length Class  Mode     
+# breaks      7      -none- numeric     # I limiti delle classi  
+# counts      6      -none- numeric     # Le frequenze assolute
+# intensities 6      -none- numeric     # same as density. Deprecated, but retained for compatibility
+# density     6      -none- numeric     # le densita' 
+# mids        6      -none- numeric     # punti medi delle classi
+# xname       1      -none- character   # il nome della variabile in esame
+# equidist    1      -none- logical     # un valore logico che indica se le classi sono equispaziate
+
+istogramma$breaks
+
+
+
+
+
+# indici sintetici di posizione:
+
+mean(record)
+min(record$m100)
+max(record$m100)
+
+
+#..e supponendo che i valori siano ordinati:
+
+quantile(record$m100,0.25)
+quantile(record$m100,0.50)  #restituisce la mediana (l'elemento in posizione centrale in un insieme di numeri)
+median(record$m100)
+quantile(record$m100,0.75)
+quantile(record$m100) #restituisce il min, i tre quartili e il max
+quantile(record$m100, c(1:10)/20) #restituisce i quantili dell'ordine specificato in  c(1:10)/20
+
+# indice di variabilità:
+
+var(record)		#varianza
+sd(record)
+
+			#deviazione standard
+		
+
+# riepilogo:
+
+summary(record$m100) o 
+summary(record)
+
+
+# se ho dei NA (Not Available), attenzione a media e mediana: 
+mean(record$m100, na.rm = T) 
+median(record$m100, na.rm = T)
+
+
+
+# boxplot
+
+boxplot(record$m100)
+
+boxplot(record$m100,horizontal=TRUE)
+
+boxplot(record$m100,horizontal=TRUE, main="boxplot records 100m",xlab="sec")
+
+##########################
+# VARIABILI CATEGORICHE
+##########################
+
+dati=read.table('province.txt',header=FALSE)
+province=dati$V1
+province
+prov=factor(province, levels=c('MI','LO','BG','CR','VA','Alt'))
+provi = as.factor(province)
+
+is(province)
+is(prov)
+is(provi)
+
+# DIAGRAMMI A BARRE
+plot(prov)
+plot(prov,col='red')
+
+fr.ass=table(prov)
+fr.rel=fr.ass/length(prov)
+fr.rel=prop.table(fr.ass)
+
+barplot(fr.rel,xlab='prov',ylab='fr',main='Freq. relative',col='red')
+
+
+x11()            # APERTURA NUOVA FINESTRA GRAFICA
+
+# GRAFICO A TORTA
+pie(fr.rel,labels=c('MI','LO','BG','CR','VA','Alt'),radius=1,col=c('red','orange','yellow','green','lightblue','violet'),main='Grafico a torta Province')
+
+
+# CALCOLO DELLA MODA
+fr.ass[which(fr.ass==max(fr.ass))]
+fr.ass[which.max(fr.ass)]

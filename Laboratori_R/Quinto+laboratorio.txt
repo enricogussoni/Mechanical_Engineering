@@ -1,0 +1,542 @@
+# LABORATORIO 5
+
+# regressione lineare semplice e multipla
+# manipolazione dati per eliminare dati mancanti
+# analisi dei residui
+# test chi^2 adattamento
+
+# REGRESSIONE LINEARE SEMPLICE
+
+
+# V1: consumi giornalieri per riscaldamento
+# V2: temperatura
+
+cons <- read.table ("Consumi.txt")
+head(cons)
+#   V1 V2
+#1 128  0
+#2 134 -4
+#3 115 -1
+#4 121 -1
+#5 139 -4
+#6 119 -2
+
+costo <- cons$V1
+temperatura <- cons$V2
+
+plot (temperatura, costo,  xlab="Temperatura", ylab="Costo riscaldamento")
+abline (v=0, lty=2)
+
+## calcolo di r^2
+
+cor(costo, temperatura)
+#[1] -0.9537239
+
+cor(costo, temperatura)^2
+#[1] 0.9095892
+
+## REGRESSIONE LINEARE
+
+regr <- lm (costo ~ temperatura)
+regr
+
+abline (regr)
+coef(regr)
+
+#(Intercept)     cons$V2 
+# 112.047288   -3.600338 
+
+## esame del risultato della stima
+
+summary(regr)
+
+# per fare la tilde, se non ce l'avete già sulla tastiera, 
+# cliccate ALT 126 (usate i numeri sulla pulsantiera a dx)
+# il coeff angolare ci dice che i consumi aumentano mediamente di 3.6 euro per ogni grado in meno di temperatura
+# l'intercetta ci dice che il consumo medio a zero gradi è di 112 euro
+
+# Call:
+# lm(formula = cons$V1 ~ cons$V2)
+#
+# Residuals:
+#      Min       1Q   Median       3Q      Max 
+# -25.8449  -7.1434   0.1602   8.2563  16.9612 
+#
+# Coefficients:
+#             Estimate Std. Error t value Pr(>|t|)    
+# (Intercept)  112.047      2.943   38.08  < 2e-16 ***
+# cons$V2       -3.600      0.227  -15.86 1.48e-14 ***
+# ---
+# Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+#
+# Residual standard error: 11.64 on 25 degrees of freedom
+# Multiple R-squared: 0.9096,	Adjusted R-squared: 0.906 
+# F-statistic: 251.5 on 1 and 25 DF,  p-value: 1.480e-14 
+
+# Il comando fitted() produce i punti stimati (mediante la retta)
+
+fitted (regr)
+
+#         1         2         3         4         5         6         7         8         9        10        11        12        13        14        15        16        17 
+# 112.04729 126.44864 115.64763 115.64763 126.44864 119.24796  90.44526  79.64424  54.44188  40.04052  22.03883  32.83985  50.84154  86.84492 104.84661 122.84830 112.04729 
+#        18        19        20        21        22        23        24        25        26        27 
+# 122.84830  97.64593  83.24458  50.84154  36.44019  29.23951  36.44019  47.24120  68.84323 122.84830 
+
+
+##Intervalli di predizione per le risposte future
+
+newdata = data.frame(temperatura=19)
+predict(regr, newdata, interval="predict")
+
+
+#       fit      lwr      upr
+#1 43.64086 18.73266 68.54907
+
+#Fornisce l'intervallo di predizione al 95% del costo per una temperatura=19 (95% CB( il default dell'argomento "level")
+
+
+## visualizziamo la previsione e l'intervallo assieme agli altri dati:
+
+abline(v=19)
+abline(regr)
+points(19,43.64086,type="p",pch=21,bg="red")
+
+polygon(c(19,19),c(18.73266,68.54907))
+
+
+
+predict(regr, newdata, interval="predict", level=0.90)
+#       fit      lwr      upr
+#1 43.64086 22.98249 64.29924
+#Fornisce l'intervallo di predizione al 90% del costo per una temperatura=19
+
+
+## ANALISI DEI RESIDUI
+
+residui <- resid(regr)
+residui
+
+
+# media residui = 0
+# guardare mediana, min, max
+
+#           1           2           3           4           5           6           7           8           9          10          11          12          13          14 
+#  15.9527124   7.5513597  -0.6476258   5.3523742  12.5513597  -0.2479639  -6.4452586 -17.6442440  -6.4418768 -11.0405242  16.9611667   0.1601522  -7.8415387 -25.8449204 
+#          15          16          17          18          19          20          21          22          23          24          25          26          27 
+# -12.8466112   0.1516979   8.9527124  15.1516979   1.3540651 -19.2445822   1.1584613  12.5598140  11.7604903   7.5598140   5.7587995  -9.8432295  -4.8483021 
+
+# guardo prima i residui da soli, per vedere per quali dati 
+# la differenza tra interpolazione e dato e' maggiore.
+
+plot(residui, main="Diagramma dispersione dei residui")
+abline(h=0)
+
+pos<-identify(1:length(costo),residui)
+pos
+
+# pos: 14, 20 i due valori dei residui piu' lontani da zero.  
+# Le osservazioni 14esima e 20esima hanno valore:
+cbind(temperatura,costo)[c(14,20),]
+ 
+##Confronto delle due rette di regressione con e senza i punti 14, 20: 
+regr1<- lm(costo[-pos] ~ temperatura[-pos] )
+summary(regr1)
+
+#Call:
+#lm(formula = costo[-pos] ~ temperatura[-pos])
+
+#Residuals:
+#     Min       1Q   Median       3Q      Max 
+#-19.4384  -8.1095  -0.5305   6.9958  15.4563 
+
+#Coefficients:
+#                  Estimate Std. Error t value Pr(>|t|)    
+#(Intercept)       114.0042     2.5766   44.24  < 2e-16 ***
+#temperatura[-pos]  -3.6184     0.1937  -18.68 2.13e-15 ***
+#---
+#Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1 
+#
+#Residual standard error: 9.926 on 23 degrees of freedom
+#Multiple R-squared: 0.9382,	Adjusted R-squared: 0.9355 
+#F-statistic:   349 on 1 and 23 DF,  p-value: 2.128e-15 
+
+plot(temperatura,costo)
+abline(regr)
+points(7,61,type="p",pch=25,bg="red")
+points(8,64,type="p",pch=25,bg="red")
+abline(regr1,lty=2)
+
+##SCATTERPLOT DEI RESIDUI STANDARDIZZATI
+# VERSUS PREDITTORE TEMPERATURA.
+ 
+# Obiettivo: identificare i dati ``influenti'' sulla retta di regressione
+## eliminazione interattiva degli outlier
+
+## residui standardizzati: (media 0 e varianza ~ 1) possono essere outliers quelli in modulo > 2
+
+
+res.standard<-rstandard(regr)
+plot(temperatura,res.standard)
+abline(h=2)
+abline(h=0)
+abline(h=-2)
+pos <- identify (temperatura, res.standard)
+pos
+# mi dice che solo il 14 potrebbe essere un outlier
+
+
+
+##Confronto delle due rette di regressione con e senza il punto 14:
+#[1] 11 14   ### io ho messo solo il 14!
+regr2<- lm(costo[-pos] ~ temperatura[-pos] )
+summary(regr2)
+
+#Call:
+#lm(formula = costo[-pos] ~ temperatura[-pos])
+#
+#Residuals:
+#     Min       1Q   Median       3Q      Max 
+#-20.2453  -7.4379  -0.1760   7.5643  16.2050 
+#
+#Coefficients:
+#                  Estimate Std. Error t value Pr(>|t|)    
+#(Intercept)       113.1630     2.7153   41.67  < 2e-16 ***
+#temperatura[-pos]  -3.6147     0.2067  -17.49 3.67e-15 ***
+#---
+#Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1 
+#
+#Residual standard error: 10.59 on 24 degrees of freedom
+#Multiple R-squared: 0.9273,	Adjusted R-squared: 0.9242 
+#F-statistic: 305.9 on 1 and 24 DF,  p-value: 3.667e-15 
+
+plot (temperatura, costo)
+abline(regr)
+par (new=TRUE)
+abline(regr2, lty=2)
+
+##########################
+##Eliminazione di dati outliers nei dati di `quest.txt', ma questa volta i risultati della regressione con senza outliers sono molto diversi
+##########################
+
+
+quest<-read.table('quest.txt')
+attach(quest)
+
+regr.q<-lm(Stipendio ~ Eta)
+summary(regr.q)
+
+#Call:
+#lm(formula = Stipendio ~ Eta)
+#
+#Residuals:
+#   Min     1Q Median     3Q    Max 
+#-997.0 -229.2  -44.5  228.8 1010.2 
+#
+#Coefficients:
+#            Estimate Std. Error t value Pr(>|t|)   
+#(Intercept)  572.417    260.932   2.194  0.03704 * 
+#Eta           23.953      6.761   3.543  0.00146 **
+#---
+#Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1 
+
+#Residual standard error: 412.1 on 27 degrees of freedom
+#  (1 observation deleted due to missingness)
+#Multiple R-squared: 0.3173,	Adjusted R-squared: 0.2921 
+#F-statistic: 12.55 on 1 and 27 DF,  p-value: 0.001463 
+
+res.standard.q<-rstandard(regr.q)
+
+#posizione osservazione mancante:
+
+posNA<-which(is.na(Eta)==TRUE)
+plot(Eta[-posNA],res.standard.q)
+abline(h=2)
+abline(h=-2)
+pos.q<-identify(Eta[-posNA],res.standard.q)
+pos.q
+#[1] 2 4
+
+regr.q2<- lm(Stipendio[-posNA][-pos.q] ~ Eta[-posNA][-pos.q] )
+
+#coefficienti di regressione con senza osservazioni 2 e 4 completamente diverse e R2 cresciuto., ma comunque p-value rimane un po' alto.
+
+summary(regr.q2)
+
+#Call:
+#lm(formula = Stipendio[-posNA][-pos.q] ~ Eta[-posNA][-pos.q])
+#
+#Residuals:
+#     Min       1Q   Median       3Q      Max 
+#-585.083 -181.943   -8.334  210.385  553.291 
+#
+#Coefficients:
+#                    Estimate Std. Error t value Pr(>|t|)    
+#(Intercept)          287.621    248.098   1.159    0.257    
+#Eta[-posNA][-pos.q]   32.094      6.892   4.656 9.08e-05 ***
+#---
+#Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1 
+#
+#Residual standard error: 312.1 on 25 degrees of freedom
+#Multiple R-squared: 0.4645,	Adjusted R-squared: 0.443 
+#F-statistic: 21.68 on 1 and 25 DF,  p-value: 9.078e-05 
+
+#CFR grafico delle rette di regressione con e senza outliers:
+
+plot (Eta[-posNA], Stipendio[-posNA])
+abline(regr.q)
+abline(regr.q2,lty=2)
+points(Eta[-posNA][2],Stipendio[-posNA][2],type="p",pch=25,bg="red")
+points(Eta[-posNA][4],Stipendio[-posNA][4],type="p",pch=25,bg="red")
+
+
+## modello non lineare
+t2 <- temperatura^2
+summary(lm (costo ~ temperatura))
+summary(lm (costo ~ temperatura + t2))
+# notare R-squared ed R sono aumentati
+
+
+
+
+###############################################################
+
+## campi dell'oggetto restituito dalla regressione
+
+names(regr)
+# [1] "coefficients"  "residuals"     "effects"       "rank"          "fitted.values" "assign"        "qr"            "df.residual"   "xlevels"       "call"         
+#[11] "terms"         "model"        
+
+regr["df.residual"]
+# $df.residual
+# [1] 25
+
+regr["rank"]
+
+# $rank
+# [1] 2
+
+
+
+# REGRESSIONE LINEARE MULTIPLA
+
+
+savings=read.table("savings.txt", header=T)
+
+# Modello lineare ottenuto utilizzando tutti i regressori
+g=lm(sr~pop15+pop75+dpi+ddpi,data=savings)
+summary(g)
+
+g=lm(sr~.,savings)
+summary(g)
+
+
+# USO solo i predittori pop15+ddpi
+g2=lm(sr~pop15+ddpi,savings)
+summary(g2)
+
+# USO solo i predittori dpi+ddpi
+g3=lm(sr~dpi+ddpi,savings)
+summary(g3)
+
+
+
+# Scelta del modello
+
+summary(g)
+
+# Eliminiamo il regressore col p-value piu' alto (tra quelli superiori al 5%)
+gupdate=update(g, .~.-dpi)
+summary(gupdate)
+
+
+
+# oppure in modo automatico:
+gfinale=step(g)
+
+
+
+
+# Analisi dei residui
+
+plot(fitted(gfinale),residuals(gfinale),xlab="Fitted",ylab="Residuals")
+abline(h=0)
+windows()
+plot(fitted(gfinale),abs(residuals(gfinale)),xlab="Fitted",ylab="Absolute value of Residuals")
+
+
+# Verifica della normalità dei residui
+qqnorm(residuals(gfinale),ylab="residuals")
+qqline(residuals(gfinale))
+windows()
+hist(residuals(gfinale),prob=TRUE)
+shapiro.test(residuals(gfinale))
+
+
+confint(gfinale)
+
+
+# previsione
+
+x0=data.frame(pop15=30,pop75=2,ddpi=10)
+predict(gfinale,x0,interval="prediction")
+
+
+
+# Altro esempio:
+
+statedata=read.table("statedata.txt",header=T)
+
+census=lm(Life.Exp~.,data=statedata)
+summary(census)
+
+
+# Eliminiamo il regressore col p-value piu' altro (tra quelli superiori al 5%)
+census<-update(census, .~.-Area)
+summary(census)
+census<-update(census, .~.-Illiteracy)
+summary(census)
+census<-update(census, .~.-Income)
+summary(census)
+
+step(census)
+
+
+
+census=lm(Life.Exp~.,data=statedata)
+
+step(census)
+censusbis=lm(Life.Exp~Population+Frost+HS.Grad+Murder,data=statedata)
+summary(censusbis)
+
+x0=data.frame(Population = 4000, Murder = 10, HS.Grad = 50, Frost = 60)
+predict(censusbis,x0)
+
+
+
+
+
+
+# TEST CHI-QUADRATO DI ADATTAMENTO
+#############
+# Utilizziamo il test Chi-quadrato di adattamento per testare che 
+# dati simulati da una gaussiana standard provengano di fatto da una gaussiana standard
+# (ci aspettiamo che il test NON rifiuti l'ipotesi nulla)
+# dati simulati:
+set.seed(17)
+y=rnorm(1000)
+n=1000
+# il numero di classi da considerare è la parte intera di
+n^(2/5)
+# in questo caso 15.
+# Visto che il problema non suggerisce delle classi particolari,
+# usiamo delle classi equiprobabili:
+
+#(-inf,qnorm(1/15)), [qnorm(1/15),qnorm(2/15)), [qnorm(2/15),qnorm(3/15)), ...
+# ... , [qnorm(13/15),qnorm(14/15)), [qnorm(14/15),inf) 
+
+
+lim_class=rep(0,16)
+
+for (i in 0:15)
+{
+lim_class[i+1]=qnorm(i/15)
+}
+
+lim_class
+
+
+#Le probabilita' teoriche sono 1/15 per ogni classe
+
+p=rep(1/15,15)
+
+# frequenze teoriche:
+1000*p
+# frequenze osservate:
+N=numeric(15)
+N=table(cut(y,lim_class))
+N
+# test
+chisq.test(x=N,p=p)
+# i gradi di libertà della Chi-quadrato sono k-1, dove k è il numero di classi considerate 
+# (nel nostro esempio consideriamo 5 classi, e quindi abbiamo 4 gradi di libertà)
+###################
+
+# Ripetiamo lo stesso test, con osservazioni provenienti da una t-student(1)
+# (ci aspettiamo ora che il test rifiuti l'ipotesi nulla)
+
+set.seed(17)
+y=rt(1000,df=1)
+N=numeric(15)
+
+
+
+N=table(cut(y,c(lim_class)))
+N
+chisq.test(x=N,p=p)
+
+####################
+# Solitamente si fanno test chi-quadrato di adattamento in cui la distribuzione dei 
+# dati non viene completamente specificata sotto H_0.
+# Ad esempio, si testa l'ipotesti nulla che le osservazioni siano gaussiane, 
+# senza specificare media e varianza.
+# In tal caso, occorre 
+# stimare i parametri che servono a specificare completamente la distribuzione dei dati (nel caso della gaussiana, media e varianza), 
+# usare tali stime per calcolare le probabilità teoriche 
+# e condurre il test chi-quadrato, facendo attenzione al fatto che ora la chi-quadrato ha
+# k-1-m gradi di libertà, dove m è il numero di parametri che abbiamo stimato 
+
+# simulazione dei dati
+set.seed(17)
+y=rnorm(1000)
+# stima dei parametri
+my=mean(y)
+sy=sd(y)
+
+# usiamo delle classi equiprobabili:
+#(-inf,qnorm(1/15,my,s)), [qnorm(1/15,my,s),qnorm(2/15,my,s)), [qnorm(2/15,my,s),qnorm(3/15,my,s)), ...
+# ... , [qnorm(13/15,my,s),qnorm(14/15,my,s)), [qnorm(14/15,my,s),inf) 
+
+
+lim_class=rep(0,16)
+
+for (i in 0:15)
+{
+lim_class[i+1]=qnorm(i/15,mean=my,sd=sy)
+}
+
+lim_class
+
+
+#Le probabilita' teoriche sono 1/15 per ogni classe
+
+p=rep(1/15,15)
+
+# frequenze teoriche 
+
+n=length(y)
+
+n*p
+# frequenze osservate
+N=numeric(15)
+N=table(cut(y,lim_class))
+N
+
+k=length(p) #numero classi
+m=2 #numero parametri stimati 
+CHIquad=sum(((N-(n*p))^2)/(n*p))
+pvalue=1-pchisq(CHIquad,df=(k-1-m))
+pvalue
+
+
+
+
+
+
+
+
+
+
+
+
+
+

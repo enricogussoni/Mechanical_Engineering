@@ -1,0 +1,1240 @@
+#LABORATORIO 3
+
+#Tabelle di frequenza per variabili categoriche
+
+quest <- read.table('quest.txt', header=T)
+
+head(quest)
+length(quest) # numero di variabili
+length(quest[,1])  # numero di individui intervistati
+
+table(quest$Sesso)
+
+tp<-table(quest$Provenienza)
+tp
+
+tp[2]	# valore frequenza per la categoria "ISOLE"
+
+tpf<-as.factor(quest$Provenienza)
+tpf
+
+
+sum(is.na(quest$Provenienza))	#conteggio valori non presenti
+
+barplot(table(quest$Provenienza))		#tabella frequenze
+barplot(table(quest$NFigli))
+
+tf<-table(quest$NFigli)
+tf    # la CLASSE MODALE corrisponde a 1 figlio
+
+tcum<-cumsum(tf)		#frequenze assolute cumulate
+tcum
+
+barplot(tcum)			#grafico delle frequenze assolute cumulate
+
+
+prop.table(tf)		#frequenze relative
+prop.table(tf)*100	
+cumsum(prop.table(tf))	#frequenze relative cumulate
+
+barplot(cumsum(prop.table(tf)))
+
+# può essere utile il raggruppamento in classi...
+
+barplot(quest$Eta)
+hist(quest$Eta)
+rug(quest$Eta)  #MOSTRA I DATI ALLA BASE DELL'ISTOGRAMMA
+
+hist(quest$Eta)$counts #CONTA I DATI NELLE CLASSI DELL'ISTOGRAMMA
+
+summary(quest$Eta)
+
+
+classiEta<-seq(20,80,by=10)
+classiEta
+
+eta2<-cut(quest$Eta,classiEta)		#suddivisione in categorie
+eta2
+
+table(eta2)
+
+classiEta<-seq(40,80,by=10)
+classiEta2<-c(20, 25, 30, 35, classiEta)
+eta2<-cut(quest$Eta,classiEta2)
+table(eta2)
+
+
+par(mfcol=c(2,1))			#gestione dei parametri grafici
+
+barplot(table(eta2),main="Classi d'eta' ", ylab="Frequenza", col="yellow")
+ 
+stip.ric<-cut(quest$Stipendio, breaks=c(0,1000,1500,2000,3000))
+barplot(table(stip.ric),main="Classi stipendiali ", ylab="Frequenza", col="red")
+
+dev.off()  # RIPRISTINA NORMALE FINESTRA GRAFICA
+
+table(cut(quest$Eta,seq(20,80,by=20)),cut(quest$Stipendio,seq(0,3000,by=1000)))
+
+plot(quest$Eta,quest$Stipendio,main=" ", ylab="Stipendio",xlab="Eta'")
+
+
+
+
+DA QUI ***********************************************
+##########################################################
+# ESERCIZIO - Variabili quantitative - analisi per gruppi#
+##########################################################
+
+
+studenti=read.table("studenti.txt",header=TRUE)
+
+head(studenti)
+dim(studenti)
+names(studenti)
+str(studenti)
+
+attach(studenti)
+
+# Relazioni tra variabili
+
+# Le ore di sonno di uno studente sono legate 
+# all'orario a cui va a dormire?
+
+Ore_Sonno = Ora_Sveglia - Ora_Letto
+
+# Analizziamo quindi la relazione tra le variabili 
+# Ora_Letto e Ore_Sonno
+
+windows()
+plot(Ora_Letto,Ore_Sonno,main="Scatterplot di Ora_Letto vs. Ore_sonno")
+
+cov(Ora_Letto,Ore_Sonno)
+cor(Ora_Letto,Ore_Sonno)
+
+# Confronto tra gruppi
+
+# Possiamo fare un confronto tra maschi e femmine 
+# di ognuna delle variabili
+
+# Chi spende più soldi per tagliarsi i capelli?
+# (in questo caso un'analisi statistica è forse superflua...)
+
+boxplot(Taglio~Sesso,main="Uomini e donne",col=c("pink","blue"))
+
+# COMMENTO AI BOXPLOT:
+# l'analisi dei due boxplot affiancati sembra confermare una tendenza 
+# della distribuzione dei soldi spesi per un taglio di capelli dalle donne
+# a concentrarsi su valori superiori rispetto a quella negli uomini.
+# Considerando il numero di outlier, la dispersione sembra maggiore 
+# nelle donne.
+# Attenzione alla scelta dei due attributi da confrontare: il primo 
+# dovrà essere numerico, in modo da consentire la disposizione dei dati del 
+# secondo lungo il boxplot. 
+
+
+# Confronto tra variabili: comando tapply
+# Sintassi: tapply(var1,var2,funzione,
+                   argomento1_funzione,argomento2_funzione,...)
+
+tapply(Taglio,Sesso,mean)
+tapply(Taglio,Sesso,var)
+
+# Se la funzione ha ulteriori argomenti, si inseriscono come argomenti 
+# di tapply dopo la funzione (quarto,quinto,... argomento).
+# Per esempio, se volessi il quantile di ordine 0.7 dei due gruppi
+
+tapply(Taglio,Sesso,quantile,prob=0.7)
+
+# A tapply posso anche passare la funzione "summary"
+
+tapply(Taglio,Sesso,summary)
+
+diff(tapply(Taglio,Sesso,range)$"M") # range uomini
+diff(tapply(Taglio,Sesso,range)$"F") # range donne
+
+# Confronto tra variabili: comando which
+
+femmine = which(Sesso=="F")
+maschi = which(Sesso=="M")
+
+femmine.taglio=Taglio[femmine]
+maschi.taglio=Taglio[maschi]
+
+# Si possono disegnare i boxplot affiancati anche manualmente,
+# senza l'uso della ~
+
+boxplot(femmine.taglio,maschi.taglio,col=c("pink","blue"))
+
+# Confrontiamo anche gli istogrammi, visualizzandoli in un unico grafico
+
+par(mfrow=c(2,1))
+hist(femmine.taglio,col="pink")
+hist(maschi.taglio,col="blue")
+
+mean(femmine.taglio)
+mean(maschi.taglio)
+median(femmine.taglio)
+median(maschi.taglio)
+
+# La distribuzione del costo del taglio di capelli per le femmine
+# presenta una forte asimettria verso destra.
+
+var(femmine.taglio)
+var(maschi.taglio)
+
+summary(femmine.taglio)
+summary(maschi.taglio)
+
+# Come facilmente pronosticabile, si osserva una grande 
+# differenza tra uomini e donne
+
+detach(studenti)
+
+
+
+#################################################
+# ESERCIZIO            - Variabili quantitative #
+#################################################
+
+## analisi dei dati quantitativi contenuti 
+## nel file "temperatura.txt"
+
+# Importazione di dataset
+
+temp <- read.table('temperatura.txt', header=T)
+
+dim(temp)
+names(temp)
+head(temp)
+str(temp)
+
+attach(temp)
+
+# Il dataset contiene 3 variabili: Temperatura, Sesso, e Frequenza Cardiaca.
+# Ci interessa analizzare la temperatura corporea. Considereremo 
+# 2 tipi di analisi:
+# 1) analisi descrittiva dei dati sulla temperatura corporea 
+#    indipendentemente dal genere
+# 2) analisi descrittiva dei dati sulla temperatura corporea 
+#    nei due sottocampioni individuati dal genere
+
+# DOMANDE
+
+# 1) Calcolare, per la variabile "Temperatura": media, mediana, primo e terzo
+#    quartile, range interquartile, varianza, deviazione standard e quantile
+#    di ordine 0.6.
+
+mean(Temperatura)
+median(Temperatura)
+quantile(Temperatura,probs=0.25)
+quantile(Temperatura,probs=0.75)
+quantile(Temperatura,probs=0.75)-quantile(Temperatura,probs=0.25)
+var(Temperatura)
+sd(Temperatura)
+quantile(Temperatura,probs=0.6)
+
+# 2) Visualizzare i dati relativi alla variabile "Temperatura" sia con
+#    un istogramma che con un boxplot e trarre opportuni commenti
+#    dall'analisi grafica.
+
+hist(Temperatura,col="forestgreen")
+
+# Dall'osservazione dell'istogramma si può osservare una sostanziale
+# simmetria dei dati
+
+boxplot(Temperatura,col="orange")
+
+# Il boxplot conferma la simmetria già osservata nell'istogramma. Inoltre
+# il numero di outliers è basso, pertanto la variabilità sembra essere bassa
+
+# 3) Considerare ora la variabile "Temperatura" alla luce della variabile
+#    categorica "Sesso" e calcolare le stesse quantità del punto 1)
+#    per gli uomini e per le donne.
+
+tapply(Temperatura,Sesso,mean)
+tapply(Temperatura,Sesso,median)
+tapply(Temperatura,Sesso,quantile,probs=0.25)
+tapply(Temperatura,Sesso,quantile,probs=0.75)
+tapply(Temperatura,Sesso,quantile,probs=0.75)-tapply(Temperatura,Sesso,quantile,probs=0.25)
+tapply(Temperatura,Sesso,var)
+tapply(Temperatura,Sesso,sd)
+tapply(Temperatura,Sesso,quantile,probs=0.6)
+
+# 4) Visualizzare i dati relativi alla variabile "Temperatura" per ognuno
+#    dei due gruppi individuati dalla variabile categorica "Sesso" con
+#    un istogramma ed un boxplot. Una delle due distribuzioni (anche alla
+#    luce di quanto calcolato al punto 3)) risulta asimmettrica? Motivare
+#    la risposta.
+
+temperatura.donne=Temperatura[which(Sesso=="D")]
+temperatura.uomini=Temperatura[which(Sesso=="U")]
+
+par(mfrow=c(2,1))
+hist(temperatura.donne,col="pink",xlim=range(Temperatura))
+hist(temperatura.uomini,col="blue",xlim=range(Temperatura))
+
+# Nessuna delle due distribuzioni sembra presentare particolari asimmetrie,
+# inoltre la temperatura delle donne sembra presentare una variabilità
+# maggiore rispetto a quella degli uomini
+
+boxplot(temperatura.donne,temperatura.uomini,col=c("pink","blue"))
+
+# La temperatura delle donne sembra essere leggermente più alta rispetto a
+# quella degli uomini. Inoltre gli outlier confermano il fatto che la
+# variabilità è maggiore nelle donne.
+
+
+
+
+# TEST E CICLI
+
+if (COND) RAMO_T else RAMO_F
+
+se la condizione booleana COND è vera, allora esegue le istruzioni RAMO_T, altrimenti RAMO_F
+
+numeri<-c(3,5,-1,12,7,99)
+Mm<- 0
+if (Mm == 0) 
+{risposta <- max(numeri)} else {risposta <- min(numeri)}
+
+for (COUNTER in RANGE) COMANDI
+
+ripete una sequenza di comandi un numero prefissato di volte.
+
+a<- 0
+for (i in 1:50) a <- a+1;
+
+a<- 0
+n<-75
+for (i in 1:n) a <- a+1;
+
+while (COND) COMANDI
+
+ripete una sequenza di comandi finché la condizione COND è vera, si ferma quando la condizione diventa falsa.
+
+repeat COMANDI
+break
+
+ripete una sequenza di comandi finché non si verifica una condizione interna che causa l'esecuzione di un break.
+
+
+INDICE :
+
+# Distribuzioni di probabilità
+# Esempi di analisi statistica bivariata e multivariata con grafici
+# Generazione numeri casuali
+# Distribuzione normale, normalizzazione e verifica della normalitˆ
+
+
+#LE DISTRIBUZIONI DI PROBABILITA’
+
+R puo calcolare la densità in un punto, la funzione di ripartizione
+in un punto, il quantile in un punto tra 0 e 1, oppure 
+generare un valore casuale dalla distribuzione.
+Queste operazioni vengono fatte da funzioni ottenute aggiungendo
+il prefisso
+
+d per la densità
+p per la ripartizione
+q per il quantile
+r per la generazione di numero casuale
+
+al nome della distribuzione. 
+
+Per esempio, consideriamo la distribuzione normale standardizzata.    
+Esistono 4 funzioni:    
+    
+dnorm(x) calcola il valore della densita' in x    
+pnorm(x) calcola il valore della ripartizione in x.    
+qnorm(a) calcola l' a-quantile 
+rnorm(n) genera un campione di dimensione n da una normale standard .    
+    
+Per vedere per esempio l'andamento della funzione di ripartizione    
+di una normale standard:    
+    
+ x <- seq(-5,5,length=100)    
+ ripx <- pnorm(x)    
+ plot(x, ripx, type="l")    
+    
+Ovviamente, possono essere gestite normali non standardizzate:    
+è sufficiente aggiungere nell'ordine la media e la deviazione    
+standard nelle chiamate sopra viste.    
+    
+ ripx1 <- pnorm(x, 2,0.7)    
+ lines(x, ripx1, col=2)    
+    
+La probabilita’ di ottenere valori fra 1 e 3 per una normale standard e’:
+
+ pnorm(3) - pnorm(1)
+
+La stessa probabilita’ per una normale di media 2 e varianza (0.5)2 e’ invece:
+
+ pnorm(3,2,0.5) - pnorm(1,2,0.5)
+
+
+Alcune delle distribuzioni disponibili sono:    
+    
+
+     +------------------------------------------------------------------+    
+     |+----------------------------------------------------------------+|    
+     ||    R         Distribuzione       Parametri           Defaults  ||    
+     |+----------------------------------------------------------------+|    
+     ||  geom         geometrica (da 0)  0 < p < 1             -       ||    
+     ||  pois         Poisson            0 < lambda            -       ||    
+     ||  chisq        chi-square         df intero positivo    -       ||    
+     ||  t            t di Student       df intero positivo    -       ||    
+     ||  gamma        Gamma              forma, scala          -       ||    
+     ||  lnorm        lognormale         mean, sd (del log)   0,1      ||    
+     ||  weibull      Weibull            forma, scala         0,1      ||
+     ||  f            F                  df1, df2              -       ||
+     ||  unif         uniforme           min, max             0,1      ||    
+     ||  weibull      Weibull            forma, scala         0,1      ||    
+     ||  norm         normale            mean, sd             0,1      ||
+     ||  binom        binomiale          n,p                   -       ||   
+     ||  hyper        ipergeometrica     m,n,k                 -       ||    
+     ||  exp          esponenziale neg   -                     -       ||    
+     |+----------------------------------------------------------------+|    
+     +------------------------------------------------------------------+     
+
+
+Distribuzioni discrete
+----------------------
+Disegniamo un diagramma a barre per la distribuzione binomiale di parametri n=15 e p=0.8, e, successivamente, n=50, p=0.8. Sovrapponiamo a questo grafico la curva di una densità normale con media e varianza adeguate (meanbin,sdbin ).
+
+ x <- 0:15
+ y <- dbinom(x,15,0.8)
+ plot(x,y,type='h')
+ points(x,y,pch=20)
+ title('Distribuzione Binomiale-n=15,p=0.8')
+
+aggiungiamo la curva della densita’ normale:
+ meanbin = 12
+ sdbin = 1
+ x1 <- seq(0,15,0.1)
+ lines(x1,dnorm(x1,meanbin,sdbin),col=2)
+(per esempio: scegliere 12 come media, 1 come deviazione standard)
+
+facciamo aumentare n:
+ x <- 0:50
+ y <- dbinom(x,50,0.8)
+ plot(x,y,type='h')
+ points(x,y,pch=20)
+ title('Distribuzione Binomiale-n=50,p=0.8')
+
+aggiungiamo la curva della densita’ normale:
+
+ x1 <- seq(0, 50, 0.1)
+ lines(x1,dnorm(x1,meanbin,sdbin),col=2)
+
+La probabilita’ sotto la binomiale con n=15 e p=0.8 di ottenere un numero di successi minore o uguale a 2 e’
+
+ pbinom(2,15,0.8)
+
+ovvero
+
+ dbinom(0,15,0.8) + dbinom(1,15,0.8) + dbinom(2,15,0.8)
+
+
+Adattamento ad una distribuzione continua
+-----------------------------------------
+    
+Consideriamo un campione generato da una distribuzione    
+normale standard di ampiezza 10:    
+    
+ x <- rnorm(10)                   
+    
+Supponiamo di non sapere che il campione proviene da una popolazione normale. 
+Proviamo a studiare graficamente la distribuzione dei dati, 
+per capire da che popolazione deriva.    
+    
+ hist(x)    
+ hist(x,nclass=8)    
+ hist(x,nclass=15)    
+ hist(x,nclass=8,prob=T)    ### prob=T fa sí che l'area sottesa sia 1
+ boxplot(x)    
+
+Esercizio: sovrapporre all'istogramma un grafico a linea della densità normale.
+
+Facciamo un altro esempio con numerosita' piú grande:    
+    
+ xx <- rnorm(100)    
+ hist(xx)    
+ boxplot(xx)    
+    
+Che strumenti grafici abbiamo a disposizione per vedere se proviene
+o meno da una distribuzione normale?    
+    
+ qqnorm(xx)    #in ascissa il valore del quantile di xx, in ordinata il valore della N(0,1)
+ qqline(xx)    #traccia una linea tra i valori del primo e terzo quartile, in ordinata il valore della N(0,1)
+    
+
+Esercizio: provare a verificare la normalita' di x. Cosa si puo' dire?    
+    
+Per rendersi conto dell'aspetto del qqnorm quando i dati non    
+sono normali, generiamo dei dati da una distribuzione "simile"    
+alla normale (la distribuzione t)e da una completamente diversa 
+(l'esponenziale) e poi confrontiamoli.    
+    
+ y <- rt(100,2)    
+ hist(y)    
+ qqnorm(y)    
+ qqline(y)    
+    
+ z <- rexp(100)    
+ hist(z)    
+ qqnorm(z)    
+ qqline(z)    
+    
+ par(mfrow=c(1,2))    
+ qqnorm(xx)    
+ qqline(xx)    
+ qqnorm(y)    
+ qqline(y)    
+ qqnorm(xx)    
+ qqline(xx)    
+ qqnorm(z)    
+ qqline(z)    
+ par(mfrow=c(1,1))    
+    
+
+Adattamento ad una distribuzione discreta
+-----------------------------------------
+    
+Per vedere l'accostamento di variabili discrete a modelli    
+di riferimento, usare invece il metodo seguente.
+
+Per esempio, generiamo 100 dati da una Poisson di parametro 5    
+    
+ x <- rpois(100,5)    
+    
+La distribuzione di frequenze puo' essere ottenuta con    
+il comando table()    
+    
+ tab <- table(x)    
+ tab    
+
+ 1  2  3  4  5  6  7 8 9 10 12 13     
+ 3 10 17 15 10 15 12 7 5  4  1  1 
+   
+ names(tab)  
+      
+ [1] "1"  "2"  "3"  "4"  "5"  "6"  "7"  "8"  "9"  "10" "12" "13"    
+    
+    
+Un semplice grafico della distribuzione di frequenze assolute    
+puo' essere ottenuto con i comandi:    
+    
+  plot(tab, type='h')    
+  points(tab,pch=5)    
+    
+Dal momento che alcuni valori potrebbero avere frequenza nulla    
+(come il valore 11 nell'esempio sopra riportato), puo'    
+essere conveniente costruire il grafico in questo modo:    
+    
+ plot(as.numeric(names(tab)),tab, type='h')    
+ points(as.numeric(names(tab)),tab,pch=5)    
+    
+Per vedere l'accostamento di variabili discrete a modelli    
+di riferimento, possiamo confrontare la nostra distribuzione     
+empirica di frequenze con quella teorica che ci si aspetta    
+dato il modello di riferimento.    
+    
+Per esempio, confrontiamo la nostra distribuzione di     
+frequenze empirica con quella teorica che ci si aspetta    
+per una Poisson(5) (che in questo caso sappiamo essere    
+la distribuzione di provenienza dei dati, quindi ci aspettiamo    
+una forte similitudine).    
+    
+Costruiamo prima la probabilita' di ottere 1,2,3,4,...,13    
+per una Poisson(5)    
+    
+ prob <- dpois(1:13,5)    
+    
+Per ottenere le frequenze attese per 100 individui:    
+    
+ attese <- 100*prob    
+ attese   
+ 
+ [1]  3.3689735  8.4224337 14.0373896 17.5467370 17.5467370 14.6222808    
+ [7] 10.4444863  6.5278039  3.6265577  1.8132789  0.8242177  0.3434240    
+[13]  0.1320862   
+ 
+ attese <- round(attese)  
+  
+ [1]  3  8 14 18 18 15 10  7  4  2  1  0  0  
+  
+ names(attese) <- 1:13    
+    
+Quindi confrontiamo.    
+    
+ tab  
+  
+ 1  2  3  4  5  6  7 8 9 10 12 13     
+ 3 10 17 15 10 15 12 7 5  4  1  1  
+  
+ attese    
+
+ 1 2  3  4  5  6  7 8 9 10 11 12 13     
+ 3 8 14 18 18 15 10 7 4  2  1  0  0    
+    
+Per effettuare il confronto grafico:    
+    
+ lines((1:13)+0.2, attese,lty=3,type='h',col=2)    
+    
+Alcune classi potrebbero avere una frequenza che supera il limite 
+superiore dell'asse y nel grafico.    
+E' quindi necessario ricostruire l'intero grafico tenendo conto di questo:    
+    
+ plot(as.numeric(names(tab)),tab,type='h',ylim=range(tab,attese))    
+ points(as.numeric(names(tab)),tab,pch=5)    
+ lines((1:13)+0.2, attese,lty=3,type='h',col=2)    
+ points((1:13)+0.2, attese,pch=3)    
+
+NOTA sul comando names:
+
+z <- 1:3
+names(z)
+## assegna un nome solo ad un elemento di z
+>names(z)[2] <- "b"
+>z
+
+##POISSON
+k <- 0:20
+p <- dpois(k, lambda = 5)
+plot(k, p, type = "h", lwd = 10)
+
+# par(mfcol=c(2,2))
+# dev.off() 
+
+##REALIZZAZIONI DI POISSONIANE
+
+s<-c()
+for (i in 1:10000) s[i]<-mean(rpois(n=1,1))
+hist(s,prob=T,xlim=c(0,4),ylim=c(0,2))
+for (i in 1:10000) s[i]<-mean(rpois(n=5,1))
+hist(s,prob=T,xlim=c(0,4),ylim=c(0,2))
+for (i in 1:10000) s[i]<-mean(rpois(n=10,1))
+hist(s,prob=T,xlim=c(0,4),ylim=c(0,2))
+for (i in 1:10000) s[i]<-mean(rpois(n=20,1))
+hist(s,prob=T,xlim=c(0,4),ylim=c(0,2))
+
+##ESPONENZIALE
+
+curve(dexp(x, rate = 5), col="red", ylab = "Densità",
+from = 0, to = 2, main = "Distribuzione esponenziale")
+
+##REALIZZAZIONE DI ESPONENZIALI
+
+s<-c()
+for (i in 1:10000) s[i]<-mean(rexp(n=1,rate=1))
+hist(s,prob=T,xlim=c(0,4),ylim=c(0,2))
+for (i in 1:10000) s[i]<-mean(rexp(n=5,rate=1))
+hist(s,prob=T,xlim=c(0,4),ylim=c(0,2))
+for (i in 1:10000) s[i]<-mean(rexp(n=10,rate=1))
+hist(s,prob=T,xlim=c(0,4),ylim=c(0,2))
+for (i in 1:10000) s[i]<-mean(rexp(n=20,rate=1))
+hist(s,prob=T,xlim=c(0,4),ylim=c(0,2))
+
+##CONTINUA UNIFORME
+
+curve(dunif(x, min = 1, max = 5), col="red", from = 0,
+to = 6, ylab = "Densità", ylim = c(0,0.5), main =
+"Distribuzione continua")
+
+##GAMMA
+
+curve(dgamma(x, shape = 0.5, rate = 5), col = "red",
+ylab = "Densità", from = 0, to = 2, main =
+"Distribuzione Gamma")
+curve(dgamma(x, shape = 1, rate = 5), from = 0, to = 2,
+add = T, lty = 2)
+curve(dgamma(x, shape = 2, rate = 5), col = "blue",
+from = 0, to = 2, add = T, lty = 3)
+curve(dgamma(x, shape = 3, rate = 5), col = "green",
+from = 0, to = 2, add = T, lty = 4)
+legend(1.2,6, c("shape = 1/2", "shape = 1", "shape =
+2", "shape = 3"), lty = c(1, 2, 3, 4))
+
+##REALIZZAZIONI DI GAMMA
+
+s<-c()
+for (i in 1:10000) s[i]<-mean(rgamma(n=1,1))
+hist(s,prob=T,xlim=c(0,4),ylim=c(0,2))
+for (i in 1:10000) s[i]<-mean(rgamma(n=5,1))
+hist(s,prob=T,xlim=c(0,4),ylim=c(0,2))
+for (i in 1:10000) s[i]<-mean(rgamma(n=10,1))
+hist(s,prob=T,xlim=c(0,4),ylim=c(0,2))
+for (i in 1:10000) s[i]<-mean(rgamma(n=20,1))
+hist(s,prob=T,xlim=c(0,4),ylim=c(0,2))
+
+##REALIZZAZIONI DI GEOMETRICA
+
+s<-c()
+for (i in 1:10000) s[i]<-mean(rgeom(n=1,prob = 1/4))
+hist(s,prob=T,xlim=c(0,4),ylim=c(0,2))
+for (i in 1:10000) s[i]<-mean(rgeom(n=5,prob = 1/4))
+hist(s,prob=T,xlim=c(0,4),ylim=c(0,2))
+for (i in 1:10000) s[i]<-mean(rgeom(n=10,prob = 1/4))
+hist(s,prob=T,xlim=c(0,4),ylim=c(0,2))
+for (i in 1:10000) s[i]<-mean(rgeom(n=20,prob = 1/4))
+hist(s,prob=T,xlim=c(0,4),ylim=c(0,2))
+
+##CHIQUADRATO
+
+curve(dchisq(x, df = 3), 0.,20, ylab = "Densità", col =
+"red", main = "Distribuzione CHI-Quadrato")
+curve(dchisq(x, df = 5), 0.,20, ylab = "Densità", col =
+"blue", lty = 2, add = T)
+curve(dchisq(x, df = 7), 0.,20, ylab = "Densità", col =
+"green", lty = 2, add = T)
+legend(10,0.2, c("gdl = 3", "gdl = 5", "gdl = 7"), lty
+= c(1, 2, 3))
+
+##TSTUDENT
+
+curve(dnorm(x), -5, 5, ylab = "Densità", col = "red",
+main = "Distribuzione t di Student")
+curve(dt(x, df = 1), -6, 6, lty = 2, col = "blue", add
+= T)
+curve(dt(x, df = 2), -6, 6, lty = 3, col = "green", add
+= T)
+legend(2,0.3, c("Z", "t, gdl = 1", "t, gdl = 2"), lty =
+c(1, 2, 3))
+
+
+# GENERAZIONE NUMERI PSEUDOCASUALI
+##################################
+
+set.seed(3)
+
+# generare 100 osservazioni da una variabile Exp(3)
+# farne l'istogramma e sovrapporre densità di Exp(3)
+
+
+
+W=rexp(100,3)
+
+hist(W,prob=TRUE,xlim=c(0,3))
+x=seq(0,3,by=0.01)
+y=dexp(x,rate=3)
+
+#y=3*exp(-3*x)
+# In effetti non c'è bisogno di calcolare la densità della Exp(3)
+# lo fa in automatico il comando dexp()
+
+
+hist(W,prob=TRUE,xlim=c(0,3))
+lines(x,y,col="red")
+
+#comandi equivalenti
+
+ points(x,y,type="l")
+
+# Oppure ancora si può usare il comando curve
+
+ curve(dexp(x,3),xlim=c(0,3),type="l",add=T)
+
+
+# Generare ulteriori 900 osservazioni da una variabile Exp(3)
+# e aggiungerle nell'istogramma
+# Vedrete che l'istogramma approssima meglio la densità teorica 
+
+
+V=rexp(900,3)
+
+V=c(W,V)
+windows()
+hist(V,prob=TRUE,xlim=c(0,3))
+lines(x,y,col="red")
+
+
+# Generare ulteriori 9000 osservazioni da una variabile Exp(3)
+# e aggiungerle nell'istogramma
+# Vedrete che l'istogramma approssima meglio la densità teorica 
+
+
+R=rexp(9000,3)
+
+R=c(V,R)
+windows()
+hist(R,prob=TRUE,xlim=c(0,3),breaks="fd")
+lines(x,y,col="red")
+
+
+# Per avere una miglior visualizzazione di questo risultato
+# fare istogrammi con classi più piccole 
+
+
+par (mfrow=c(2,2))
+hist(W,prob=TRUE,breaks="fd",xlim=c(0,3))
+points(x,dexp(x,3),type="l")
+hist(V,prob=TRUE,breaks="fd",xlim=c(0,3))
+points(x,dexp(x,3),type="l")
+hist(R,prob=TRUE,breaks="fd",xlim=c(0,3))
+points(x,dexp(x,3),type="l")
+
+
+#Facciamo il punto della situazione, abbiamo costruito 3 vettori
+# W,V,R, contenenti, rispettivamente 100, 1000, 10000, dati generati da una
+# distibuzione Exp(3)
+# Se volessi verificare:
+length(W);length(V);length(R);
+
+
+# Se calcoliamo medie e varianze di W, V, ed R
+# ci aspettiamo che medie siano circa 1/rate=1/3=0.3333333
+# le e varianze siano circa 1/rate^2=1/(3^2)=0.111111
+
+
+Sommario<-matrix(nrow=2,ncol=4,c(1/3,1/3^2,mean(W),var(W),mean(V),var(V),mean(R),var(R)))
+colnames(Sommario)=c("Teoriche","W","V","R")
+Sommario
+
+
+
+# Ripetiamo ora lo stesso procedimento con osservazioni Gaussiane standard
+# Fissiamo il "seme" del generatore di numeri casuali,
+# in modo da avere tutti lo stesso risultato!
+
+set.seed(4)
+
+
+W=rnorm(100)
+hist(W,prob=TRUE,xlim=c(-6,6))
+
+x=seq(-6,6,by=0.01)
+y=dnorm(x)
+
+hist(W,prob=TRUE,xlim=c(-6,6))
+lines(x,y,col="red")
+
+
+# Generare ulteriori 900 osservazioni da una variabile Gaussiane standard
+# e aggiungerle nell'istogramma
+# Vedrete che l'istogramma approssima meglio la densità teorica 
+
+V=rnorm(900)
+
+V=c(W,V)
+windows()
+hist(V,prob=TRUE,xlim=c(-6,6))
+lines(x,y,col="red")
+
+
+# Generare ulteriori 9000 osservazioni da variabili Gaussiane standard
+# e aggiungerle nell'istogramma
+# Vedrete che l'istogramma approssima meglio la densità teorica 
+
+
+R=rnorm(9000)
+
+R=c(V,R)
+windows()
+hist(R,prob=TRUE,xlim=c(-6,6))
+lines(x,y,col="red")
+
+
+
+# Per avere una miglior visualizzazione di questo risultato
+# fare istogrammi con classi più piccole, usiamo l'algoritmo
+# di Freedman-Diaconis
+
+
+
+par (mfrow=c(2,2))
+hist(W,prob=TRUE,breaks="fd",xlim=c(-6,6))
+points(x,dnorm(x),type="l")
+hist(V,prob=TRUE,breaks="fd",xlim=c(-6,6))
+points(x,dnorm(x),type="l")
+hist(R,prob=TRUE,breaks="fd",xlim=c(-6,6))
+points(x,dnorm(x),type="l")
+
+
+# calcoliamo medie e varianze di W, V, ed R
+# mi aspetto che medie siano circa 0
+# e varianze siano circa 1
+
+
+Sommario<-matrix(nrow=2,ncol=4,c(0,1,mean(W),var(W),mean(V),var(V),mean(R),var(R)))
+colnames(Sommario)=c("Teoriche","W","V","R")
+Sommario
+
+
+#################################
+# Legge dei grandi numeri (LGN) #
+#################################
+
+# Generiamo 20000 variabili gaussiane standard e  
+# vediamo che la media delle prime n osservazioni
+# converge a 0 per n che va verso l'infinito
+
+set.seed(5)
+
+# Normale:
+
+Me=rnorm(1000,0,1)
+media_progressiva=NULL 
+for (i in 1:1000){
+	media_progressiva=c(media_progressiva,mean(Me[1:i]))
+}
+
+plot(1:1000,media_progressiva,lwd=2,type="l",xlim=c(0,1000),ylim=c(-.5,.5), xlab="Numero osservazioni", ylab="Media campionaria")
+abline(h=0, col="red")
+
+# Esponenziale:
+
+lambda=2
+Me=rexp(1000,rate=lambda)
+media_progressiva=NULL 
+for (i in 1:1000){
+	media_progressiva=c(media_progressiva,mean(Me[1:i]))
+}
+
+plot(1:1000,media_progressiva,lwd=2,type="l",xlim=c(0,1000),ylim=c(0,1), xlab="Numero osservazioni", ylab="Media campionaria")
+abline(h=1/lambda, col="red")
+
+# Binomiale:
+
+n=10
+p=0.7
+Mb=rbinom(1000, size=n, prob=p)
+media_progressiva=NULL 
+for (i in 1:1000){
+	media_progressiva=c(media_progressiva,mean(Mb[1:i]))
+}
+
+plot(1:1000,media_progressiva,lwd=2,type="l",xlim=c(0,1000),ylim=c(6,8), xlab="Numero osservazioni", ylab="Media campionaria")
+abline(h=n*p, col="red")
+
+
+
+
+#Funzione di ripartizione (distribuzione normale)
+
+pnorm(3) # P(Z<3), dove Z è N(0,1)
+pnorm(0) # P(Z<0), dove Z è N(0,1)
+pnorm(0,1,1) # P(X<0), dove X è N(1,1)
+
+
+
+#Quantili per la distribuzione normale
+
+qnorm(0.975) #  =z tale che  P(Z<z)=0.975, dove Z è N(0,1)
+qnorm(0.95)  #  =z tale che  P(Z<z)=0.95, dove Z è N(0,1)
+qnorm(0.5)   #  =z tale che  P(Z<z)=0.5, dove Z è N(0,1)
+
+
+#Esempio: supponiamo di voler generare una variabile casuale di BERNOULLI di parametro "p". Supponiamo di voler generare 5 ripetizioni con parametro 
+p = 1/3.
+
+a<- runif(5)
+a<1/3
+1*(a<1/3)
+
+oppure tutto insieme:
+1*(runif(5)<1/3)
+
+in alternativa:
+as.integer(a<1/3)
+
+se vogliamo generare una variabile aleatoria di Bernoulli con parametro n=10 e p=1/3, basterˆ fare la somma degli "1":
+sum(runif(10)<1/3)
+
+#Esempio: (ancora sulla runif) confrontiamo la distribuzione empirica generata di 1000 numeri pseudocasuali e la vera densitˆ di probabilitˆ esponenziale.
+lambda <- 0.25
+y <- -log(runif(1000))/lambda
+hist(y,freq=FALSE)
+curve(dexp(x,lambda),0.25,add=TRUE)
+
+
+
+
+# GRAFICI DI DENSITA' DI ALTRE DISTRUBUZIONI STUDIATE, PER DIVERSI VALORI DEI PARAMETRI utilizzando le funzioni predefinite
+
+# binomiale di parametri (10,0.5)
+plot(0:10,dbinom(0:10,10,0.5))
+
+dbinom(2,10,0.5) # P(B=2), dove B è Binom(10,0.5)
+
+pbinom(3,10,0.5) # P(B<=3), dove B è Binom(10,0.5)
+
+dbinom(0,10,0.5)+dbinom(1,10,0.5)+dbinom(2,10,0.5)+dbinom(3,10,0.5)
+
+# binomiale di parametri (10,0.2)
+plot(0:10,dbinom(0:10,10,0.2))
+
+
+# TEOREMA CENTRALE DEL LIMITE 
+
+# Il Teorema Centrale del Limite (TCL) afferma che, se X1,...,Xn
+# sono variabili aleatorie indipendenti e identicamente distribuite,
+# ognuna con valore atteso mu e varianza sigma^2, allora la distribuzione di 
+#
+# (Mn-mu)/sqrt(sigma^2/n)
+#
+# converge alla distribuzione di una normale standard (media=0 e varianza=1)
+# per n che tende all'infinito, dove Mn è la media campionaria di
+# X1,...,Xn.
+
+
+
+
+# per il TLC, una distribuzione binomiale di parametri (n,p), tale che 
+# np>=5 e n(1-p)>=5, può essere approssimata con una distribuzione gaussiana
+# con  media=np  e  varianza=np(1-p)
+
+# Verifichiamo graficamente tale risultato
+
+# Consideriamo una variabile binomiale X di parametri n=100 e p=0.4
+
+
+plot(0:100,dbinom(0:100,100,0.4))
+
+
+windows()
+plot(20:60,dbinom(20:60,100,0.4))
+
+
+# P(X<=35)
+
+pbinom(35,100,0.4)
+
+c=19:35
+cmezz=c+0.5
+
+windows()
+plot(20:60,dbinom(20:60,100,0.4))
+points(c(20,60),c(0,0),type="l")
+for (i in 1:16)
+{points(c(cmezz[i],cmezz[i+1]),c(dbinom(c[i+1],100,0.4),dbinom(c[i+1],100,0.4)),type="l")
+ points(c(cmezz[i],cmezz[i]),c(0,dbinom(c[i+1],100,0.4)),type="l")}
+points(c(cmezz[i+1],cmezz[i+1]),c(0,dbinom(c[i+1],100,0.4)),type="l")
+
+
+
+# Per il TCL la legge di X potrà essere approssimata da una variabile gaussiana
+# con  media=100*0.4=40  e  varianza=100*0.4*0.6=24
+# e quindi in particolare P(X<=35) potrà essere approssimata mediante 
+# l'area sotto la densità, da -infinto a 35.5,
+# di una gaussiana di parametri (40,24)
+
+
+windows()
+plot(20:60,dbinom(20:60,100,0.4),xlab="",ylab="")
+curve(dnorm(x,40,sqrt(24)),0,100,add=T,col="red")
+points(c(20,60),c(0,0),type="l")
+for (i in 1:16)
+{points(c(cmezz[i],cmezz[i+1]),c(dbinom(c[i+1],100,0.4),dbinom(c[i+1],100,0.4)),type="l")
+ points(c(cmezz[i],cmezz[i]),c(0,dbinom(c[i+1],100,0.4)),type="l")}
+points(c(cmezz[i+1],cmezz[i+1]),c(0,dbinom(c[i+1],100,0.4)),type="l")
+
+
+
+w=seq(20,35.5,by=0.01)
+windows()
+plot(20:60,dbinom(20:60,100,0.4),xlab="",ylab="")
+curve(dnorm(x,40,sqrt(24)),0,100,add=T,col="red")
+polygon(c(w,35.5,20),c(dnorm(w,40,sqrt(24)),0,0),density=-0.5,border="red",col="red") 
+points(c(cmezz[i+1],cmezz[i+1]),c(0,dnorm(35.5,40,sqrt(24))),type="l",col=2)
+points(c(20,60),c(0,0),type="l")
+for (i in 1:16)
+{points(c(cmezz[i],cmezz[i+1]),c(dbinom(c[i+1],100,0.4),dbinom(c[i+1],100,0.4)),type="l")
+ points(c(cmezz[i],cmezz[i]),c(0,dbinom(c[i+1],100,0.4)),type="l")}
+points(c(cmezz[i+1],cmezz[i+1]),c(0,dbinom(c[i+1],100,0.4)),type="l")
+points(20:60,dbinom(20:60,100,0.4))
+
+# TCL per variabili aleatorie uniformi
+
+n=500
+min=-1
+max=1
+
+# Calcoliamo la media dell'uniforme
+mean_unif=(min+max)/2                       
+# Calcoliamo la varianza dell'uniforme
+var_unif=(max-min)^2/12
+
+# Campioniamo da un'uniforme
+par(mfrow=c(2,2))
+for (i_max in c(10,50,250,1000)) {
+tcl_uniforme=NULL
+for (i in 1:i_max){
+	tcl_uniforme=c(tcl_uniforme,(mean(runif(n,min,max))-mean_unif)/sqrt(var_unif/n))
+}
+
+hist(tcl_uniforme,prob=TRUE,xlim=c(-4.5,4.5),main=paste("i_max = ", i_max))
+curve(dnorm(x,mean=0,sd=1),type="l",col="red",lwd=2,add=T)
+}
+
+# TCL per variabili aleatorie Poisson
+
+n=500
+lambda=5 # Media e varianza di una Poisson sono uguali al parametro lambda
+
+# Campioniamo da una Poisson
+par(mfrow=c(2,2))
+for (i_max in c(10,50,250,1000)) {
+tcl_poisson=NULL
+for (i in 1:i_max){
+	tcl_poisson=c(tcl_poisson,(mean(rpois(n,lambda))-lambda)/sqrt(lambda/n))
+}
+
+hist(tcl_poisson,prob=TRUE,xlim=c(-4.5,4.5),main=paste("i_max = ", i_max))
+curve(dnorm(x,mean=0,sd=1),type="l",col="red",lwd=2,add=T)
+}
+
+
+
+
+# Confrontiamo le densità della t di Student all'aumentare dei gradi
+# di libertà (in rosso), con quella della normale (in blue).
+
+# Nel primo grafico visualizziamo contemporaneamente le densità per
+# n=2,4,8 e 16 gradi di libertà. Nel secondo, invece, visualizziamo la
+# funzione densità per n=30 gradi di libertà.
+
+
+par(mfrow=c(2,2))
+curve(dt(x,2),type='l',main='2 g.d.l.',ylim=c(0,0.5),col='red',xlim=c(-7,7))
+curve(dnorm(x,0,1),type='l',lty=2,col='blue',add=T)
+curve(dt(x,4),type='l',main='4 g.d.l.',ylim=c(0,0.5),col='red',xlim=c(-7,7))
+curve(dnorm(x,0,1),type='l',lty=2,col='blue',add=T)
+curve(dt(x,8),type='l',main='8 g.d.l.',ylim=c(0,0.5),col='red',xlim=c(-7,7))
+curve(dnorm(x,0,1),type='l',lty=2,col='blue',add=T)
+curve(dt(x,16),type='l',main='16 g.d.l.',ylim=c(0,0.5),col='red',xlim=c(-7,7))
+curve(dnorm(x,0,1),type='l',lty=2,col='blue',add=T)
+
+
+par(mfrow=c(1,1))
+curve(dt(x,30),type='l',main='30 g.d.l.',ylim=c(0,0.5),col='red',xlim=c(-7,7))
+curve(dnorm(x,0,1),type='l',lty=2,col='blue',add=T)
+
+# NB: possiamo osservare come la distribuzione t di Student abbia code più
+# pesanti rispetto alla distribuzione normale, ovvero la probabilità che
+# si verifichino eventi estremi è più alta.
+
+
+###########################
+# NORMAL-PROBABILITY PLOT
+
+###########################
+
+
+# Generiamo 1000 osservazioni i.i.d. da una N(0,1)
+
+z=rnorm(1000,mean=0,sd=1)
+par(mfrow=c(1,2))
+hist(z,prob=TRUE)
+curve(dnorm(x,mean=0,sd=1),type="l",col="red",lwd=2,add=T)
+
+qqnorm(z)                        # Normal probability plot
+qqline(z, col="red")
+abline(b=sd(z),a=mean(z),col="orange",lwd=2) #retta di pendenza a e intercetta b
+
+# Generiamo 1000 osservazioni i.i.d. da una t(5)
+# NB: una t di Student t(gr_lib) ha media uguale a 0 e varianza
+# uguale a gr_lib/(gr_lib-2)
+
+
+gr_lib=5
+t=rt(1000,gr_lib)
+par(mfrow=c(1,2))
+hist(t,prob=TRUE)
+curve(dnorm(x,mean=0,sd=1),type="l",col="red",lwd=2,add=T)
+
+qqnorm(t)                         # Normal probability plot
+qqline(t,col="red")
+abline(b=sd(t),a=mean(t),col="orange",lwd=2)
+
+
+# R crea automaticamente una retta attraverso il comando qqline
+# (in particolare la retta creata è quella che passa per il primo e
+# per il terzo quartile)
+
+
+# Campioniamo 1000 osservazioni i.i.d. da U(-1,1)
+min=-1
+max=1
+mean_unif=(min+max)/2                       
+var_unif=(max-min)^2/12
+
+
+u=runif(1000,min,max)
+hist(u,prob=TRUE,xlim=c(-2,2),ylim=c(0,0.7))
+x=seq(-3,3,by=0.01)
+points(x,dunif(x,min=-1,max=1),type="l",col="red",lwd=2) # per le funzioni a gradini è meglio usare points
+
+# Sovrapponiamo al grafico la curva della densità di probabilità di
+# una normale con stessa media e varianza dell'uniforme tra -1 e 1
+
+curve(dnorm(x,mean=mean_unif,sd=sqrt(var_unif)),type="l",col="blue",lwd=2,add=T)
+
+# NB: osserviamo che le code della distribuzione uniforme sono MENO pesanti
+# rispetto a quelle di una normale
+
+x11()
+qqnorm(u)
+qqline(u,col="red",lwd=2)
+abline(b=sd(u),a=mean(u),col="orange",lwd=2)
+
+# Se i dati provengono da una distribuzione con code meno pesanti
+# di quelle di una gaussiana, il qq-plot si alza nell'estremo sinistro
+# e si abbassa nell'estremo destro.
+
+# Fino ad ora abbiamo visto come si comporta il qq-plot nel caso di
+# distribuzioni diverse dalla gaussiana, ma comunque simmetriche.
+# Vediamo cosa succede nel caso di Exp(1/3). Osserviamo che tale
+# distribuzione presenta un'asimmetria verso destra (asimmetria positiva).
+
+# Campioniamo 1000 osservazioni i.i.d. da Exp(1/3)
+
+e=rexp(1000,rate=1/3) 
+hist(e,prob=TRUE)
+
+# Vediamo come si comporta il qq-plot in questo caso
+
+x11()
+qqnorm(e)
+qqline(e,col="red",lwd=2)
+abline(b=sd(e),a=mean(e),col="orange",lwd=2)
+
+# Se i dati provengono da una distribuzione che presenta un'asimmetria
+# verso destra, il qq-plot si alza sia nell'estremo sinistro che
+# nell'estremo destro.
+
+# X ~ Negative Exp(1/3) (se Y~Exp(1/3), X è X=-Y)
+# Questa distribuzione ha un'asimmetria verso sinistra (asimmetria negativa)
+
+ne=-rexp(1000,rate=1/3)
+hist(ne,prob=TRUE)
+
+
+qqnorm(ne)
+qqline(ne,col="red",lwd=2)
+abline(b=sd(ne),a=mean(ne),col="orange",lwd=2)
+
+################################
+# Distribuzioni qualsiasi
+
+#Prepariamo i campioni
+min=0
+max=10
+z=rnorm(10000,mean=0,sd=1)
+u=runif(10000,min,max)
+media=mean(u)
+dev_st=sd(u)
+# z1=rnorm(10000,mean=media,sd=dev_st)
+
+# Tanto per cominciare verifichiamo il comportamento di qqplot
+
+qqnorm(u, xlim=c(-3,3))
+par(new = TRUE)
+qqplot(z,u,col="red", xlim=c(-3,3))
+qqline(u)
+abline(a=media,b=dev_st,col="orange")
+# par(new = TRUE)
+
+# supponiamo di conoscere la distribuzione di provenienza
+
+qqplot(u,u,col="red", xlim=c(-1,10))
+qqline(u, distribution = function(p) distribution=qunif(p,min,max))

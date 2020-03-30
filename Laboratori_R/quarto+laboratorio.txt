@@ -1,0 +1,374 @@
+# LABORATORIO 4
+
+# Test di Shapiro-Wilk
+# Intervalli di confidenza
+# Verifica d'ipotesi
+# Trasformazione dei dati
+
+
+
+############################
+### Test di Shapiro-Wilk ###
+############################
+
+# Il test di Shapiro-Wilk verifica l'ipotesi nulla che un campione
+# y_1,...,y_n provenga da una popolazione distribuita normalmente
+# La statistica W può essere interpretata come il quadrato del coefficiente
+# di correlazione in un diagramma quantile-quantile.
+# Il comando shapiro.test() restituisce il valore della statistica test
+# di Shapiro-Wilk e il relativo p-value.
+# Un p-value piccolo (p < 0.05) indica una forte evidenza contro l'ipotesi nulla
+# che i dati provengano da una distribuzione gaussiana.
+
+# Campioniamo 500 osservazioni i.i.d. da una distribuzione gaussiana
+
+y=rnorm(500,mean=28,sd=3)
+
+shapiro.test(y)
+
+
+# Campioniamo adesso 500 osservazioni i.i.d. da una t di Student, prima con
+# 5 gradi di libertà...
+
+y=rt(500,df=5)
+shapiro.test(y)
+
+# ... e poi con 30 gradi di libertà
+
+y=rt(500,df=30)
+shapiro.test(y)
+
+
+
+############################
+##INTERVALLI DI CONFIDENZA
+############################
+
+
+rm(list=ls())
+set.seed(10)
+
+mu=3.43 
+sigma=2
+n=20
+alpha=0.05
+x=rnorm(n,mean=mu,sd=sigma)
+mx=mean(x) #MEDIA CAMPIONARIA
+mx
+
+#Supponiamo che mu sia incognita e sigma nota allora l'intervallo di conf a livello 
+#1-alpha per mu e' dato da
+linf=mx-qnorm(1-alpha/2)*sigma/sqrt(n)
+linf
+
+lsup=mx+qnorm(1-alpha/2)*sigma/sqrt(n)
+lsup
+
+ic=c(linf,lsup)
+ic
+
+
+plot(c(1,1),ic,type="l",lwd=2,col="brown",xlim=c(0,4),ylim=c(0,10))
+
+
+## SECONDO CAMPIONE
+
+x=rnorm(n,mean=mu,sd=sigma)
+mx=mean(x) #MEDIA CAMPIONARIA Secondo campione
+
+linf=mx-qnorm(1-alpha/2)*sigma/sqrt(n)
+linf
+lsup=mx+qnorm(1-alpha/2)*sigma/sqrt(n)
+lsup
+ic=c(linf,lsup)
+ic
+lines(c(2,2),ic,type="l",lwd=2,col="brown")
+
+
+##Terzo Campione 
+
+x=rnorm(n,mean=mu,sd=sigma)
+mx=mean(x) #MEDIA CAMPIONARIA Terzo campione
+
+linf=mx-qnorm(1-alpha/2)*sigma/sqrt(n)
+linf
+lsup=mx+qnorm(1-alpha/2)*sigma/sqrt(n)
+lsup
+ic=c(linf,lsup)
+ic
+lines(c(3,3),ic,type="l",lwd=2,col="brown")
+
+
+#Quanti intervalli dei tre precedenti contengono
+#il "vero" valore di mu?
+abline(h=mu,col="red",lwd=2,lty=2)
+
+
+## Costuiamo 100 intervalli di confidenza utilizzando campioni
+## differenti, circa (1-alpha)100% degli intervalli conterra'
+## Il valore mu!
+
+set.seed(10)
+contiene=0 #contiene e' una variabile che conta quanti intervalli 
+           #contengono il vero valore della media mu
+
+x=rnorm(n,mean=mu,sd=sigma)
+mx=mean(x) #MEDIA CAMPIONARIA del primo campione
+
+linf=mx-qnorm(1-alpha/2)*sigma/sqrt(n)
+lsup=mx+qnorm(1-alpha/2)*sigma/sqrt(n)
+
+#Se mu e' contenuto nell'intervallo, incremento di una
+# unita' la variablie 'contiene'
+if(mu>linf && mu<lsup){ contiene=contiene+1} 
+
+ic=c(linf,lsup)
+
+#Inizializzo il grafico
+plot(c(1,1),ic,type="l",lwd=2,col="brown",xlim=c(0,101),ylim=c(0,10),xlab="esperimento", ylab="I.C. per mu")
+
+
+#Ripeto le operazioni precendenti 99 volte
+for(i in 2:100){
+## i-esimo CAMPIONE
+x=rnorm(n,mean=mu,sd=sigma)
+
+mx=mean(x) #MEDIA CAMPIONARIA i-esimo campione
+
+linf=mx-qnorm(1-alpha/2)*sigma/sqrt(n)
+lsup=mx+qnorm(1-alpha/2)*sigma/sqrt(n)
+ic=c(linf,lsup) #Intervallo di confidenza basato sui dati dell'i-esimo Campione
+
+if(mu>linf && mu<lsup){ contiene=contiene+1}
+lines(c(i,i),ic,type="l",lwd=2,col="brown")
+
+}
+
+
+abline(h=mu,col="red",lwd=2,lty=2)
+
+#scriviamo la percentuale di intervalli
+#che contiene mu
+
+contiene/100 #Confidenza 
+
+
+##########################################
+# INTERVALLI DI CONFIDENZA PER MEDIA DI GUASSIANA CON VAR non NOTA
+##########################################
+
+
+
+x <- c(0.39, 0.68, 0.82, 1.35, 1.38, 1.62, 1.70, 1.71, 1.85, 2.14, 2.89, 3.69)
+ 
+s2 <- var(x)
+mx <- mean(x)
+n <- length(x)
+l.inf <- mx - qt(0.975,df=n-1) * sqrt(s2/n) 
+l.sup <- mx + qt(0.975,df=n-1) * sqrt(s2/n) 
+cat("(",l.inf,":",l.sup,")\n")
+
+t.test(x)
+t.test(x, conf.lev=0.99)
+
+
+
+
+# Esempio (granelli di polvere su lastra di silicio)
+# Si è determinato il peso, in microgrammi, di alcuni granelli di polvere 
+# rilevati su una piastra di Silicio. Si suppone che il peso
+# sia distribuito secondo una v.a. normale. 
+#
+# I dati sono:
+
+x=c(0.39,0.68,0.82,1.35,1.38,1.62,1.70,1.71,1.85,2.14,2.89,3.69)
+
+# Si vuole un i.c al 95% per mu
+
+mx=mean(x)
+s=sd(x)
+
+alpha=0.05
+n=length(x)
+linf=mx-qt(1-alpha/2,df=n-1)*s/sqrt(n)
+linf
+
+lsup=mx+qt(1-alpha/2,df=n-1)*s/sqrt(n)
+lsup
+ic=c(linf,lsup)
+ic
+
+##########################################
+# per fare il tutto con un comando
+##########################################
+
+t.test(x) # livello di confidenza di default è 0.95
+t.test(x,conf.level=0.99) # notate che l'intervallo ha ora una maggior ampiezza
+t.test(x,conf.level=0.90) # notate che l'intervallo ha ora una minor ampiezza
+# l'opzione 
+# alternative = "less"
+#  alternative="greater" 
+# serve per avere intervalli di confidenza unilaterali
+t.test(x,alternative="greater")
+t.test(x,alternative="less")
+
+
+### INTERVALLO DI CONFIDENZA PER LA VARIANZA
+
+x
+var(x)
+
+# test a due code:
+conf.level <- 0.95
+alpha <- 1-conf.level
+n <- length(x)
+linf <- (n-1)*var(x)/qchisq(1-alpha/2,df=n-1)
+lsup <- (n-1)*var(x)/qchisq(alpha/2,df=n-1)
+
+#test a una coda:
+linf <- 0
+lsup <- (n-1)*var(x)/qchisq(alpha,df=n-1)
+
+c(linf, lsup)
+
+
+### INTERVALLO DI CONFIDENZA PER LE PROPORZIONI
+curve(x*(1-x),0,1)
+abline(v=0.5,lty=2)
+
+pn <- 0.51
+n <- 2500
+l.inf <- pn - qnorm(0.975) * sqrt(pn*(1-pn)/n) 
+l.sup <- pn + qnorm(0.975) * sqrt(pn*(1-pn)/n) 
+cat("(",l.inf,":",l.sup,")\n")
+
+l.inf <- pn - qnorm(0.975) * 0.5/sqrt(n) 
+l.sup <- pn + qnorm(0.975) * 0.5/sqrt(n) 
+cat("(",l.inf,":",l.sup,")\n")
+
+prop.test(x=1275,n=2500,corr=FALSE)
+prop.test(1275, 2500)
+binom.test(1275,2500)
+
+pnorm(0.02*sqrt(2500))
+pnorm(0.02*sqrt(1000))
+pnorm(0.02*sqrt(500))
+
+pbinom(1250,2500,0.51,lower.tail=FALSE)
+pbinom(500,1000,0.51,lower.tail=FALSE)
+pbinom(250,500,0.51,lower.tail=FALSE)
+
+
+###  TEST D'IPOTESI PER LA MEDIA
+
+x <- c(2928, 2997, 2689, 3081, 3011, 2996, 2962, 
+ 3007, 3000, 2953, 2792, 2947, 3094, 2913, 3017)
+mean(x)
+t.test(x, mu=3010, alternative="less")
+
+x <- c(1975, 1869, 1879, 1790, 1860, 1895, 1810, 1831,
+ 1759, 1585, 1553, 1774, 1640, 1761, 1946, 1915, 1894, 
+ 1971, 1876, 1716, 1652, 1591, 1700, 1842, 1781)
+mean(x)
+t.test(x,mu=1730,alternative="greater")
+
+### VERIFICA DI IPOTESI SULLE PROPORZIONI
+z <- (32/50 - 0.5)/sqrt(0.5*0.5/50)
+z
+pnorm(z,lower.tail=FALSE) # il p-value
+binom.test(32,50,alternative="greater")
+
+prop.test(32,50,alternative="greater")
+
+###  VERIFICA DI IPOTESI SULLA VARIANZA
+x <- rnorm(100, sd=5)
+var(x)
+
+test.var(x,20)
+test.var(x,30)
+
+test.var(x,22,"less")
+
+### VERIFICA DI IPOTESI PER DUE PROPORZIONI
+farmaco <-  c("Placebo", "Aspirina")
+esito <- c("Infartuati", "Non infartuati")
+tab <- matrix( c(239,139,10795,10898), 2,2,
+    dimnames = list(farmaco,esito))
+
+tab
+
+p1 <- 239/11034
+p2 <- 139/11037
+p1
+p2
+
+p <- (239+139)/22071
+p
+
+qnorm(0.99)
+
+prop.test( c(239,139), c(11034,11037) )
+prop.test( c(239,139), c(11034,11037), alternative = "greater" )
+prop.test( c(239,139), c(11034,11037), alternative = "less" )
+
+### CONFRONTO TRA LE MEDIE DI GRUPPI
+qt(0.95,df=10)
+
+m <- rnorm(5,mean=540,sd=299)
+f <- rnorm(7,mean=300,sd=238)
+t.test(m,f,alternative="greater")
+
+### CONFRONTO TRA VARIANZE
+x <- rnorm(10, sd=5)
+y <- rnorm(15, sd=3)
+var(x)
+var(y)
+
+var.test(x,y,alternative="greater")
+var.test(x,y,alternative="less")
+
+
+
+# VERIFICA D'IPOTESI
+# Test per media di una gaussiana
+# riprendiamo i dati precedenti:
+
+
+x=c(0.39,0.68,0.82,1.35,1.38,1.62,1.70,1.71,1.85,2.14,2.89,3.69)
+
+# si verifichi l'ipotesi nulla
+# H0: mu=1.15
+# contro un'alternativa bilaterale
+t.test(x,mu=1.15) 
+# notate che il p-value è 0.07
+# dunque, con livelli di significatività del 1% e 5% 
+# l'ipotesi nulla NON è rifiutata, 
+# mentre è rifiutata a livello 10%.
+# Ed infatti il valore mu=1.15 è contenuto negli i.c. 
+# di livello 99% e 95%
+# ma non è contenuto in quello di livello 90%.
+
+
+# Esempio (funi per arrampicata)
+
+# Grazie ad un nuovo processo produttivo una fabbrica di funi 
+# per arrampicata sportiva ottiene i seguenti risultati in 25 prove di rottura
+# (risultati espressi in Newton): 
+
+r=c(1975,1869,1879,1790,1860,1895,1810,1831,1759,1585,1553,1774,1640,1761,1946,1915,1894,1971,1876,1716,1652,1591,1700,1842,1781)
+ 
+# Si sa che le funi tradizionali hanno una resistenza 
+# di rottura pari a 1730N. 
+# Ci si chiede se il processo produttivo abbia significativamente migliorato la qualità 
+# delle funi.
+# Si vuole dunque condurre il test
+# H0: mu=1730  contro  H1: mu>1730 
+
+
+# Test per varianza di una gaussiana
+# Si vuole ora verificare che la varianza della resistenza delle funi 
+# non sia superiore a 28900 N^2 (deviazione standard 170 N)
+# Si conduce dunque il test:
+# H0: sigma2 > 28900
+# H1: sigma2 <= 28900
+
