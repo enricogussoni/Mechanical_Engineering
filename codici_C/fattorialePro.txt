@@ -1,0 +1,26 @@
+#include <stdio.h>
+
+int main()
+{
+int i,n,f;
+
+ do {
+  printf("Inserisci un numero maggiore di 0\n");
+  scanf("%d",&n);
+  } while (n<=0);
+  
+ if (n%1 !=0)
+    printf("Scusa, volevo dire 'inserisci un numero naturale maggiore di 0'\n");
+    else
+       {  
+         for(i=1,f=n; i<(n-1); i++) 
+         {
+         f=f*(n-i);
+         printf("i=%d, %d, f=%d,\n",i,n-i,f);
+         }  
+	    } 
+   
+  printf("Il fattoriale del numero digitato è %d\n",f);
+
+return 0;
+}

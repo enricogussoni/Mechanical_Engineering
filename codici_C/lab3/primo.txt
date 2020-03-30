@@ -1,0 +1,28 @@
+#include <stdio.h>
+#include <math.h>
+
+int main()
+{
+int n,i;
+int primo=0;
+
+do
+ { 
+  printf("S'inserisca un numero intero positivo\n");
+  scanf("%d",&n);
+ }while((n<0)||(n>0));
+ 
+for(i=2;i<=sqrt(n);i++)
+   if((n%i)==0)
+     primo=0;
+        
+        
+if(primo==0)
+   printf("%d non è primo\n",n);
+else
+   printf("%d è primo\n",n);
+   
+printf("FINI PROGRAMMA\n");
+        
+return 0;
+}
