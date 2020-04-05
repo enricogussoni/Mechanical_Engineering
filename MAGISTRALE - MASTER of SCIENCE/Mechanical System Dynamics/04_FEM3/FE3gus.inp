@@ -1,0 +1,23 @@
+! FEM(1)
+! 1st Exercise
+! 		---------------------------------------------
+! list of nodes :
+*NODES
+! n. of node - constraint code (x,y,theta) - x coordinate- y coordinate.     
+1                  1 1 1             0.0      0.0
+2                  0 0 0             0.0      0.5	
+3                  0 0 0             0.0      1.0
+4                  0 0 0            -0.5      1.0
+5                  0 0 0            -1.0      1.0
+6                  1 0 1            -1.0      0.5
+! end card *NODES
+*ENDNODES
+! 		---------------------------------------------
+! list of elements :
+*BEAMS
+! n. of elem. - n. of input node - n. of output node - m, EA, EJ	
+1       1      2    19.5    5.15e8   1.1e5 
+2       2      3    19.5    5.15e8   1.1e5
+3       3      4    19.5    5.15e8   1.1e5
+4       4      5    19.5    5.15e8   1.1e5
+*ENDBEAMS
