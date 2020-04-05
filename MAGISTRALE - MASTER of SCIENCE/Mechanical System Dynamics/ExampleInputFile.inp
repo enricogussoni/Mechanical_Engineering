@@ -1,0 +1,15 @@
+! FEM
+! TE20072011
+! 		---------------------------------------------
+! list of nodes :
+*NODES
+! n. of node - constraint code (x,y,theta) - x coordinate- y coordinate.     
+1                  1 1 1             
+! end card *NODES
+*ENDNODES
+! 		---------------------------------------------
+! list of elements :
+*BEAMS
+! n. of elem. - n. of input node - n. of output node - m, EA, EJ	
+1 
+*ENDBEAMS
